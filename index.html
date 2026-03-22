@@ -1,970 +1,198 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
-<title>チー娘すごろく</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チー娘チャージ</title>
+
 <style>
-  *{
-    box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent;
-  }
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #000;
+  overflow: hidden;
+}
 
-  html,body{
-    margin:0;
-    padding:0;
-    width:100%;
-    min-height:100%;
-    background:#0d0d12;
-    color:#fff;
-    font-family:sans-serif;
-  }
+/* ===== 画面共通 ===== */
+.screen {
+  display: none;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
 
-  body{
-    display:flex;
-    justify-content:center;
-  }
+.active {
+  display: block;
+}
 
-  .app{
-    width:100%;
-    max-width:430px;
-    min-height:100vh;
-    padding:14px 10px 20px;
-    background:
-      radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 35%),
-      linear-gradient(180deg, #1a1b22 0%, #0d0d12 100%);
-    position:relative;
-    overflow:hidden;
-  }
+/* ===== 画像 ===== */
+.bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: zoom 8s ease-in-out infinite alternate;
+}
 
-  .title{
-    text-align:center;
-    font-size:24px;
-    font-weight:900;
-    letter-spacing:.08em;
-    margin:4px 0 12px;
-  }
+@keyframes zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
 
-  .panel{
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.07);
-    border-radius:22px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
-  }
+/* ===== 吹き出し ===== */
+.bubble {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85%;
+  background: rgba(255,255,255,0.9);
+  border-radius: 20px;
+  padding: 16px;
+  text-align: center;
+  font-size: 18px;
+}
 
-  .statusBox{
-    padding:14px 14px 10px;
-    margin-bottom:12px;
-  }
+/* 三角（ズラし：60%） */
+.bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 60%;
+  transform: translateX(-50%);
+  border-width: 10px 10px 0 10px;
+  border-style: solid;
+  border-color: rgba(255,255,255,0.9) transparent transparent transparent;
+}
 
-  .statusTop{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:8px;
-    font-size:14px;
-    font-weight:800;
-    margin-bottom:10px;
-  }
+/* ===== ボタン ===== */
+.buttons {
+  position: absolute;
+  bottom: 8%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  .diceArea{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:12px;
-    min-height:74px;
-    font-weight:900;
-  }
+button {
+  width: 80%;
+  margin: 10px;
+  padding: 18px;
+  font-size: 18px;
+  border: none;
+  border-radius: 16px;
+  background: rgba(220,200,170,0.9);
+  color: #fff;
+}
 
-  .diceEmoji{
-    font-size:44px;
-    line-height:1;
-  }
+button:active {
+  transform: scale(0.96);
+}
 
-  .diceNum{
-    font-size:58px;
-    line-height:1;
-    min-width:48px;
-    text-align:center;
-  }
+.row {
+  display: flex;
+  width: 90%;
+  justify-content: space-between;
+}
 
-  .subInfo{
-    margin-top:8px;
-    text-align:center;
-    font-size:12px;
-    opacity:.72;
-    min-height:18px;
-  }
-
-  .boardWrap{
-    padding:12px;
-    margin-bottom:12px;
-  }
-
-  .boardTitleRow{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:10px;
-  }
-
-  .boardTitle{
-    font-size:14px;
-    font-weight:900;
-  }
-
-  .miniBtn{
-    appearance:none;
-    border:1px solid rgba(255,255,255,.08);
-    background:rgba(255,255,255,.05);
-    color:#fff;
-    border-radius:999px;
-    padding:8px 12px;
-    font-size:12px;
-    font-weight:800;
-    cursor:pointer;
-  }
-
-  .board{
-    display:grid;
-    grid-template-columns:repeat(5, 1fr);
-    gap:7px;
-  }
-
-  .cell{
-    min-height:78px;
-    border-radius:16px;
-    background:#181922;
-    border:1px solid rgba(255,255,255,.06);
-    position:relative;
-    overflow:hidden;
-    padding:8px 6px 6px;
-  }
-
-  .cell.goal{
-    background:linear-gradient(180deg, #5c4a00 0%, #2c2400 100%);
-    border-color:rgba(255,220,120,.35);
-  }
-
-  .cell.event-plus{
-    box-shadow:inset 0 0 0 1px rgba(120,255,160,.18);
-  }
-
-  .cell.event-minus{
-    box-shadow:inset 0 0 0 1px rgba(255,140,140,.16);
-  }
-
-  .cell.event-again{
-    box-shadow:inset 0 0 0 1px rgba(140,200,255,.16);
-  }
-
-  .cellNum{
-    font-size:11px;
-    font-weight:900;
-    opacity:.95;
-  }
-
-  .eventMark{
-    position:absolute;
-    right:6px;
-    top:6px;
-    font-size:12px;
-    font-weight:900;
-    opacity:.92;
-  }
-
-  .tokens{
-    position:absolute;
-    left:6px;
-    right:6px;
-    bottom:6px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:4px;
-    min-height:24px;
-    align-items:flex-end;
-  }
-
-  .token{
-    min-width:23px;
-    height:23px;
-    padding:0 6px;
-    border-radius:999px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:12px;
-    font-weight:900;
-    color:#111;
-  }
-
-  .you{ background:#fff; }
-  .a{ background:#ffbfdc; }
-  .b{ background:#bedcff; }
-  .c{ background:#d6ffb8; }
-
-  .controls{
-    display:flex;
-    gap:8px;
-    margin-bottom:12px;
-  }
-
-  .mainBtn{
-    appearance:none;
-    border:none;
-    border-radius:18px;
-    padding:15px 14px;
-    font-size:16px;
-    font-weight:900;
-    cursor:pointer;
-  }
-
-  #rollBtn{
-    flex:1;
-    background:#ffffff;
-    color:#111;
-  }
-
-  #resetBtn{
-    width:100px;
-    background:#272935;
-    color:#fff;
-    border:1px solid rgba(255,255,255,.08);
-  }
-
-  button:disabled{
-    opacity:.48;
-    cursor:default;
-  }
-
-  .ranking{
-    padding:12px;
-  }
-
-  .rankingTitle{
-    font-size:14px;
-    font-weight:900;
-    margin-bottom:8px;
-  }
-
-  .rankLine{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:9px 10px;
-    margin-bottom:6px;
-    border-radius:13px;
-    background:rgba(255,255,255,.04);
-    font-size:13px;
-    font-weight:800;
-  }
-
-  .historyOverlay,
-  .girlOverlay,
-  .diceOverlay{
-    position:fixed;
-    inset:0;
-    z-index:90;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .28s ease;
-  }
-
-  .historyOverlay.show,
-  .girlOverlay.show,
-  .diceOverlay.show{
-    opacity:1;
-    pointer-events:auto;
-  }
-
-  .historyOverlay{
-    background:rgba(0,0,0,.55);
-  }
-
-  .historySheet{
-    position:absolute;
-    left:50%;
-    bottom:-82vh;
-    transform:translateX(-50%);
-    width:min(92vw,430px);
-    height:74vh;
-    background:#14151c;
-    border-radius:24px 24px 0 0;
-    border:1px solid rgba(255,255,255,.07);
-    transition:bottom .35s ease;
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-  }
-
-  .historyOverlay.show .historySheet{
-    bottom:0;
-  }
-
-  .historyHead{
-    padding:14px 14px 10px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid rgba(255,255,255,.06);
-  }
-
-  .historyTitle{
-    font-size:16px;
-    font-weight:900;
-  }
-
-  .closeBtn{
-    appearance:none;
-    border:1px solid rgba(255,255,255,.08);
-    background:rgba(255,255,255,.05);
-    color:#fff;
-    border-radius:999px;
-    padding:8px 12px;
-    font-size:12px;
-    font-weight:800;
-    cursor:pointer;
-  }
-
-  .historyBody{
-    padding:10px 14px 20px;
-    overflow-y:auto;
-    flex:1;
-  }
-
-  .historyLine{
-    padding:10px 0;
-    border-bottom:1px solid rgba(255,255,255,.06);
-    font-size:14px;
-    line-height:1.55;
-  }
-
-  .historyEmpty{
-    opacity:.65;
-    font-size:14px;
-    padding-top:8px;
-  }
-
-  /* 女の子全面 */
-  .girlOverlay{
-    background:#dcdcdc;
-    z-index:100;
-  }
-
-  .girlStage{
-    position:absolute;
-    inset:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    padding:16px 10px 0;
-  }
-
-  .girlSpeech{
-    width:min(95vw, 700px);
-    background:rgba(255,255,255,.58);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-    color:#111;
-    border-radius:30px;
-    padding:18px 20px 22px;
-    position:relative;
-    box-shadow:0 8px 24px rgba(0,0,0,.08);
-    border:1px solid rgba(255,255,255,.45);
-  }
-
-  .girlSpeech::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    bottom:-18px;
-    width:0;
-    height:0;
-    border-left:18px solid transparent;
-    border-right:18px solid transparent;
-    border-top:18px solid rgba(255,255,255,.58);
-    filter:drop-shadow(0 2px 0 rgba(255,255,255,.18));
-  }
-
-  .girlName{
-    display:inline-block;
-    margin-bottom:14px;
-    padding:8px 15px;
-    border-radius:999px;
-    background:#111;
-    color:#fff;
-    font-size:14px;
-    font-weight:900;
-  }
-
-  .girlText{
-    font-size:18px;
-    font-weight:900;
-    line-height:1.6;
-    min-height:58px;
-  }
-
-  .girlImageWrap{
-    flex:1;
-    width:100%;
-    display:flex;
-    align-items:flex-end;
-    justify-content:center;
-    padding-top:18px;
-    overflow:hidden;
-  }
-
-  .girlImage{
-    width:100vw;
-    max-width:none;
-    height:calc(100vh - 180px);
-    object-fit:cover;
-    object-position:center top;
-  }
-
-  /* サイコロ画面 */
-  .diceOverlay{
-    background:rgba(8,8,12,.92);
-    z-index:110;
-  }
-
-  .diceStage{
-    position:absolute;
-    inset:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:24px;
-    padding:24px;
-  }
-
-  .diceLabel{
-    font-size:20px;
-    font-weight:900;
-    opacity:.95;
-  }
-
-  .diceBig{
-    font-size:100px;
-    line-height:1;
-  }
-
-  .diceResult{
-    font-size:84px;
-    font-weight:900;
-    line-height:1;
-    min-height:92px;
-  }
-
-  .footerSpace{
-    height:10px;
-  }
+.row button {
+  width: 48%;
+}
 </style>
 </head>
+
 <body>
-  <div class="app">
-    <div class="title">チー娘すごろく</div>
 
-    <div class="panel statusBox">
-      <div class="statusTop">
-        <span id="turnLabel">現在の番：あなた</span>
-        <span>ゴール：20マス</span>
-      </div>
-      <div class="diceArea">
-        <div class="diceEmoji">🎲</div>
-        <div class="diceNum" id="diceNum">-</div>
-      </div>
-      <div class="subInfo" id="subInfo">あなたの番を待っています</div>
-    </div>
+<!-- ===== TOP ===== -->
+<div id="top" class="screen active">
+  <img src="top.jpg" class="bg">
+  <div class="bubble">今日はどうする？</div>
 
-    <div class="panel boardWrap">
-      <div class="boardTitleRow">
-        <div class="boardTitle">盤面</div>
-        <button class="miniBtn" id="historyBtn" type="button">履歴</button>
-      </div>
-      <div class="board" id="board"></div>
-    </div>
-
-    <div class="controls">
-      <button class="mainBtn" id="rollBtn" type="button" disabled>サイコロをふる</button>
-      <button class="mainBtn" id="resetBtn" type="button">リセット</button>
-    </div>
-
-    <div class="panel ranking">
-      <div class="rankingTitle">順位</div>
-      <div id="rankingBody"></div>
-    </div>
-
-    <div class="footerSpace"></div>
+  <div class="buttons">
+    <button onclick="go('charge')">チャージ</button>
+    <button onclick="go('dice')">サイコロ</button>
+    <button onclick="go('special')">特別</button>
   </div>
+</div>
 
-  <div class="girlOverlay" id="girlOverlay">
-    <div class="girlStage">
-      <div class="girlSpeech">
-        <div class="girlName" id="girlName">チー娘A</div>
-        <div class="girlText" id="girlText">いくよ。</div>
-      </div>
-      <div class="girlImageWrap">
-        <img src="girl1.png" alt="チー娘" class="girlImage" id="girlImage">
-      </div>
-    </div>
-  </div>
+<!-- ===== チャージ ===== -->
+<div id="charge" class="screen">
+  <img src="charge.jpg" class="bg">
+  <div class="bubble">今日はどんな感じ？</div>
 
-  <div class="diceOverlay" id="diceOverlay">
-    <div class="diceStage">
-      <div class="diceLabel" id="diceLabel">サイコロ…</div>
-      <div class="diceBig">🎲</div>
-      <div class="diceResult" id="diceResult">?</div>
+  <div class="buttons">
+    <div class="row">
+      <button>いい日だった</button>
+      <button>ちょっと疲れた</button>
     </div>
+    <div class="row">
+      <button>落ち込んだ</button>
+      <button>なんでもない</button>
+    </div>
+    <button onclick="go('top')">もどる</button>
   </div>
+</div>
 
-  <div class="historyOverlay" id="historyOverlay">
-    <div class="historySheet">
-      <div class="historyHead">
-        <div class="historyTitle">履歴</div>
-        <button class="closeBtn" id="closeHistoryBtn" type="button">閉じる</button>
-      </div>
-      <div class="historyBody" id="historyBody"></div>
-    </div>
+<!-- ===== サイコロ ===== -->
+<div id="dice" class="screen">
+  <img src="dice.jpg" class="bg">
+  <div id="diceText" class="bubble">サイコロを振る？</div>
+
+  <div class="buttons">
+    <button onclick="roll()">振る</button>
+    <button onclick="go('top')">もどる</button>
   </div>
+</div>
+
+<!-- ===== サイコロ結果 ===== -->
+<div id="diceResult" class="screen">
+  <img src="dice.jpg" class="bg">
+  <div id="resultText" class="bubble">…</div>
+
+  <div class="buttons">
+    <button onclick="roll()">もう一回振る</button>
+    <button onclick="go('top')">トップへ</button>
+  </div>
+</div>
+
+<!-- ===== 特別 ===== -->
+<div id="special" class="screen">
+  <img src="special.jpg" class="bg">
+  <div class="bubble">特別メニューだよ。どれにする？</div>
+
+  <div class="buttons">
+    <button>誕生日</button>
+    <button>7色チーズ牛丼</button>
+    <button onclick="go('top')">もどる</button>
+  </div>
+</div>
 
 <script>
-  const GOAL = 20;
-
-  const players = [
-    { id:"you", label:"あなた", short:"自", pos:0, type:"human" },
-    { id:"a", label:"チー娘A", short:"A", pos:0, type:"cpu", girlIndex:0 },
-    { id:"b", label:"チー娘B", short:"B", pos:0, type:"cpu", girlIndex:1 },
-    { id:"c", label:"チー娘C", short:"C", pos:0, type:"cpu", girlIndex:2 }
-  ];
-
-  const girls = [
-    {
-      name:"チー娘A",
-      image:"girl1.png",
-      introHuman:["あなたの番だよ。","押したら振るよ。","準備できたらどうぞ。"],
-      introCpu:["いくよ。","始まるよ。","見てて。"],
-      move:["いい感じ。","まあまあ進んだね。","その調子。"],
-      plus:["ちょっと得したね。","ラッキーだよ。","進んでいいよ。"],
-      minus:["ちょっと戻ろっか。","少し下がるね。","ここは戻るみたい。"],
-      again:["もう1回どうぞ。","続けて振っていいよ。","もう一度いけるよ。"],
-      winYou:["やった、あなたの勝ち。","先にゴールだね。","勝ち、おめでとう。"],
-      winCpu:["やった、私が1番。","先に着いたよ。","勝っちゃった。"]
-    },
-    {
-      name:"チー娘B",
-      image:"girl2.png",
-      introHuman:["ほら、あなたの番。","押したら始まるよ。","準備できた？"],
-      introCpu:["ほら、始まるよ。","見てなさい。","出るかな。"],
-      move:["悪くない。","まあ、こんなもんかな。","まだこれからでしょ。"],
-      plus:["ちょっと運いいじゃん。","はい、進んでいいよ。","ラッキーなんじゃない？"],
-      minus:["少し戻るみたい。","まあ、そういう時もある。","戻ってね。"],
-      again:["もう1回ね。","続けてどうぞ。","今回はもう1回でいいよ。"],
-      winYou:["あなたの勝ちか。まあいいけど。","先に着いたのね。","はいはい、おめでとう。"],
-      winCpu:["私の勝ち。まあ当然かな。","ほらね、勝った。","先にゴールしたけど？"]
-    },
-    {
-      name:"チー娘C",
-      image:"girl3.png",
-      introHuman:["あなたの番。","押して。","……準備できたら。"],
-      introCpu:["……いく。","始まる。","出る。"],
-      move:["進んだ。","悪くない。","まだ行ける。"],
-      plus:["さらに進む。","得した。","前へ。"],
-      minus:["少し下がる。","戻る。","……しかたない。"],
-      again:["もう1回。","続けて。","再挑戦。"],
-      winYou:["ゴール。あなたの勝ち。","……先だったね。","勝ち。おめでとう。"],
-      winCpu:["ゴール。私の勝ち。","……先だった。","終わり。勝った。"]
-    }
-  ];
-
-  const eventMap = {
-    3:  { type:"plus",  value:2 },
-    6:  { type:"minus", value:2 },
-    8:  { type:"again", value:0 },
-    11: { type:"plus",  value:1 },
-    14: { type:"minus", value:3 },
-    17: { type:"again", value:0 }
-  };
-
-  let turnIndex = 0;
-  let gameEnded = false;
-  let busy = false;
-  let historyLogs = [];
-  let waitingForUserRoll = false;
-  let currentSpeakerGirl = 0;
-
-  const boardEl = document.getElementById("board");
-  const rankingBodyEl = document.getElementById("rankingBody");
-  const turnLabelEl = document.getElementById("turnLabel");
-  const diceNumEl = document.getElementById("diceNum");
-  const subInfoEl = document.getElementById("subInfo");
-  const rollBtn = document.getElementById("rollBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const historyBtn = document.getElementById("historyBtn");
-
-  const girlOverlay = document.getElementById("girlOverlay");
-  const girlNameEl = document.getElementById("girlName");
-  const girlTextEl = document.getElementById("girlText");
-  const girlImageEl = document.getElementById("girlImage");
-
-  const diceOverlay = document.getElementById("diceOverlay");
-  const diceLabelEl = document.getElementById("diceLabel");
-  const diceResultEl = document.getElementById("diceResult");
-
-  const historyOverlay = document.getElementById("historyOverlay");
-  const historyBody = document.getElementById("historyBody");
-  const closeHistoryBtn = document.getElementById("closeHistoryBtn");
-
-  function rand(arr){
-    return arr[Math.floor(Math.random() * arr.length)];
-  }
-
-  function wait(ms){
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  function getGirlIndexForTurn(player){
-    if(player.type === "human"){
-      return Math.floor(Math.random() * 3);
-    }
-    return player.girlIndex;
-  }
-
-  function updateButtons(){
-    rollBtn.disabled = !(waitingForUserRoll && !busy && !gameEnded);
-    historyBtn.disabled = busy;
-  }
-
-  function setBusy(flag){
-    busy = flag;
-    updateButtons();
-  }
-
-  function updateTurnLabel(){
-    const current = players[turnIndex];
-    turnLabelEl.textContent = `現在の番：${current.label}`;
-  }
-
-  function setSubInfo(text){
-    subInfoEl.textContent = text;
-  }
-
-  function addHistory(text){
-    historyLogs.unshift(text);
-    renderHistory();
-  }
-
-  function renderHistory(){
-    historyBody.innerHTML = "";
-    if(!historyLogs.length){
-      const empty = document.createElement("div");
-      empty.className = "historyEmpty";
-      empty.textContent = "まだ履歴はありません。";
-      historyBody.appendChild(empty);
-      return;
-    }
-
-    historyLogs.forEach(line => {
-      const div = document.createElement("div");
-      div.className = "historyLine";
-      div.textContent = line;
-      historyBody.appendChild(div);
-    });
-  }
-
-  function openHistory(){
-    if(busy) return;
-    historyOverlay.classList.add("show");
-  }
-
-  function closeHistory(){
-    historyOverlay.classList.remove("show");
-  }
-
-  function showGirl(girlIndex, text){
-    girlNameEl.textContent = girls[girlIndex].name;
-    girlTextEl.textContent = text;
-    girlImageEl.src = girls[girlIndex].image;
-    girlOverlay.classList.add("show");
-  }
-
-  function hideGirl(){
-    girlOverlay.classList.remove("show");
-  }
-
-  function showDice(label, value = "?"){
-    diceLabelEl.textContent = label;
-    diceResultEl.textContent = value;
-    diceOverlay.classList.add("show");
-  }
-
-  function hideDice(){
-    diceOverlay.classList.remove("show");
-  }
-
-  function movePlayer(player, amount){
-    player.pos = Math.max(0, Math.min(GOAL, player.pos + amount));
-  }
-
-  function drawBoard(){
-    boardEl.innerHTML = "";
-
-    for(let i = 0; i <= GOAL; i++){
-      const cell = document.createElement("div");
-      let cls = "cell";
-      if(i === GOAL) cls += " goal";
-      if(eventMap[i]?.type === "plus") cls += " event-plus";
-      if(eventMap[i]?.type === "minus") cls += " event-minus";
-      if(eventMap[i]?.type === "again") cls += " event-again";
-      cell.className = cls;
-
-      const num = document.createElement("div");
-      num.className = "cellNum";
-      num.textContent = i === GOAL ? "GOAL" : i;
-      cell.appendChild(num);
-
-      if(eventMap[i]){
-        const mark = document.createElement("div");
-        mark.className = "eventMark";
-        if(eventMap[i].type === "plus") mark.textContent = `+${eventMap[i].value}`;
-        if(eventMap[i].type === "minus") mark.textContent = `-${eventMap[i].value}`;
-        if(eventMap[i].type === "again") mark.textContent = "↺";
-        cell.appendChild(mark);
-      }
-
-      const tokens = document.createElement("div");
-      tokens.className = "tokens";
-
-      players.forEach(player => {
-        if(player.pos === i){
-          const token = document.createElement("div");
-          token.className = `token ${player.id}`;
-          token.textContent = player.short;
-          tokens.appendChild(token);
-        }
-      });
-
-      cell.appendChild(tokens);
-      boardEl.appendChild(cell);
-    }
-  }
-
-  function updateRanking(){
-    const sorted = [...players].sort((a, b) => b.pos - a.pos);
-    rankingBodyEl.innerHTML = "";
-
-    sorted.forEach((p, index) => {
-      const row = document.createElement("div");
-      row.className = "rankLine";
-      row.innerHTML = `<span>${index + 1}位　${p.label}</span><span>${p.pos} / ${GOAL}</span>`;
-      rankingBodyEl.appendChild(row);
-    });
-  }
-
-  async function introForCurrentTurn(){
-    const player = players[turnIndex];
-    const girlIndex = getGirlIndexForTurn(player);
-    currentSpeakerGirl = girlIndex;
-    updateTurnLabel();
-
-    if(player.type === "human"){
-      waitingForUserRoll = true;
-      updateButtons();
-      setSubInfo("あなたの番です");
-      showGirl(girlIndex, rand(girls[girlIndex].introHuman));
-    } else {
-      waitingForUserRoll = false;
-      updateButtons();
-      setSubInfo("チー娘の番です");
-      showGirl(girlIndex, rand(girls[girlIndex].introCpu));
-      await wait(1700);
-      hideGirl();
-      await wait(350);
-      await executeRoll();
-    }
-  }
-
-  async function showResultReaction(girlIndex, text){
-    showGirl(girlIndex, text);
-    await wait(1700);
-    hideGirl();
-    await wait(280);
-  }
-
-  async function handleEvent(player, girlIndex){
-    const event = eventMap[player.pos];
-    if(!event || player.pos >= GOAL) return false;
-
-    if(event.type === "plus"){
-      const before = player.pos;
-      movePlayer(player, event.value);
-      drawBoard();
-      updateRanking();
-      setSubInfo(`イベント：+${event.value}マス`);
-      addHistory(`${player.label} はイベントで ${event.value} マス進んだ（${before} → ${player.pos}）`);
-      await showResultReaction(girlIndex, rand(girls[girlIndex].plus));
-
-      if(player.pos >= GOAL){
-        await handleWin(player, girlIndex);
-      }
-      return false;
-    }
-
-    if(event.type === "minus"){
-      const before = player.pos;
-      movePlayer(player, -event.value);
-      drawBoard();
-      updateRanking();
-      setSubInfo(`イベント：-${event.value}マス`);
-      addHistory(`${player.label} はイベントで ${event.value} マス戻った（${before} → ${player.pos}）`);
-      await showResultReaction(girlIndex, rand(girls[girlIndex].minus));
-      return false;
-    }
-
-    if(event.type === "again"){
-      setSubInfo("イベント：もう1回");
-      addHistory(`${player.label} はイベントでもう1回。`);
-      await showResultReaction(girlIndex, rand(girls[girlIndex].again));
-
-      if(player.type === "human"){
-        waitingForUserRoll = true;
-        updateButtons();
-        showGirl(girlIndex, rand(girls[girlIndex].introHuman));
-      } else {
-        await wait(450);
-        await introForCurrentTurn();
-      }
-      return true;
-    }
-
-    return false;
-  }
-
-  async function handleWin(player, girlIndex){
-    gameEnded = true;
-    waitingForUserRoll = false;
-    updateButtons();
-    updateRanking();
-
-    if(player.type === "human"){
-      addHistory("あなたがゴールして勝利。");
-      setSubInfo("あなたの勝ち");
-      showGirl(girlIndex, rand(girls[girlIndex].winYou));
-    } else {
-      addHistory(`${player.label} がゴール。`);
-      setSubInfo(`${player.label} の勝ち`);
-      showGirl(girlIndex, rand(girls[girlIndex].winCpu));
-    }
-
-    showDice("ゴール", "★");
-    rollBtn.textContent = "終了";
-    rollBtn.disabled = true;
-  }
-
-  async function executeRoll(){
-    if(gameEnded || busy) return;
-
-    setBusy(true);
-
-    const player = players[turnIndex];
-    const girlIndex = currentSpeakerGirl || getGirlIndexForTurn(player);
-    const before = player.pos;
-
-    waitingForUserRoll = false;
-    updateButtons();
-
-    showDice("サイコロ…", "?");
-    await wait(350);
-    diceResultEl.textContent = "1";
-    await wait(220);
-    diceResultEl.textContent = "4";
-    await wait(220);
-    diceResultEl.textContent = "2";
-    await wait(220);
-    diceResultEl.textContent = "6";
-    await wait(260);
-
-    const dice = Math.floor(Math.random() * 6) + 1;
-    diceResultEl.textContent = dice;
-    diceNumEl.textContent = dice;
-    setSubInfo(`${dice}マス進んだ`);
-    await wait(1100);
-    hideDice();
-    await wait(150);
-
-    movePlayer(player, dice);
-    drawBoard();
-    updateRanking();
-    addHistory(`${player.label} が ${dice} マス進んだ（${before} → ${player.pos}）`);
-
-    await showResultReaction(girlIndex, rand(girls[girlIndex].move));
-
-    if(player.pos >= GOAL){
-      await handleWin(player, girlIndex);
-      setBusy(false);
-      return;
-    }
-
-    const again = await handleEvent(player, girlIndex);
-    if(gameEnded){
-      setBusy(false);
-      return;
-    }
-    if(again){
-      setBusy(false);
-      return;
-    }
-
-    turnIndex = (turnIndex + 1) % players.length;
-    setBusy(false);
-    await wait(700);
-    await introForCurrentTurn();
-  }
-
-  async function resetGame(){
-    hideGirl();
-    hideDice();
-    players.forEach(p => p.pos = 0);
-    turnIndex = 0;
-    gameEnded = false;
-    busy = false;
-    historyLogs = [];
-    waitingForUserRoll = false;
-    currentSpeakerGirl = 0;
-
-    diceNumEl.textContent = "-";
-    rollBtn.textContent = "サイコロをふる";
-
-    drawBoard();
-    updateRanking();
-    renderHistory();
-    updateTurnLabel();
-    setSubInfo("ゲーム開始");
-    addHistory("ゲーム開始。");
-    updateButtons();
-
-    await wait(700);
-    await introForCurrentTurn();
-  }
-
-  rollBtn.addEventListener("click", async () => {
-    if(!waitingForUserRoll || busy || gameEnded) return;
-    hideGirl();
-    await wait(250);
-    await executeRoll();
-  });
-
-  historyBtn.addEventListener("click", openHistory);
-  closeHistoryBtn.addEventListener("click", closeHistory);
-  historyOverlay.addEventListener("click", (e) => {
-    if(e.target === historyOverlay) closeHistory();
-  });
-  resetBtn.addEventListener("click", resetGame);
-
-  resetGame();
+function go(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+const results = [
+  "今日はチャージ強め",
+  "今日はゆっくりしよう",
+  "7色チーズ牛丼チャンス",
+  "今日は何も考えない日",
+  "ちょっといいことあるかも"
+];
+
+function roll(){
+  go('diceResult');
+
+  const text = document.getElementById("resultText");
+  text.innerHTML = "コロコロ…";
+
+  setTimeout(()=>{
+    const r = results[Math.floor(Math.random()*results.length)];
+    text.innerHTML = "…出た<br>「" + r + "」";
+  }, 1000);
+}
 </script>
+
 </body>
 </html>
