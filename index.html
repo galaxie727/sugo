@@ -67,10 +67,6 @@
     margin-bottom: 10px;
   }
 
-  .statusTop span:last-child {
-    opacity: 0.95;
-  }
-
   .diceArea {
     display: flex;
     align-items: center;
@@ -263,83 +259,24 @@
     font-weight: 800;
   }
 
-  .cutinOverlay,
-  .historyOverlay {
+  .historyOverlay,
+  .cutinOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 50;
+    z-index: 80;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.22s ease;
   }
 
-  .cutinOverlay.show,
-  .historyOverlay.show {
+  .historyOverlay.show,
+  .cutinOverlay.show {
     opacity: 1;
     pointer-events: auto;
   }
 
-  .cutinBox {
-    position: absolute;
-    left: 50%;
-    bottom: -440px;
-    transform: translateX(-50%);
-    width: min(92vw, 430px);
-    transition: bottom 0.28s ease;
-    padding: 0 10px 10px;
-  }
-
-  .cutinOverlay.show .cutinBox {
-    bottom: 0;
-  }
-
-  .cutinSpeech {
-    position: relative;
-    background: #fff;
-    color: #111;
-    border-radius: 22px;
-    padding: 16px 16px;
-    font-size: 17px;
-    font-weight: 900;
-    line-height: 1.5;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.28);
-    margin-bottom: 10px;
-  }
-
-  .cutinSpeech::after {
-    content: "";
-    position: absolute;
-    left: 38px;
-    bottom: -14px;
-    border-width: 14px 11px 0 11px;
-    border-style: solid;
-    border-color: #fff transparent transparent transparent;
-  }
-
-  .cutinName {
-    display: inline-block;
-    margin-bottom: 8px;
-    padding: 5px 10px;
-    border-radius: 999px;
-    background: #111;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 900;
-  }
-
-  .cutinGirlWrap {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    min-height: 260px;
-  }
-
-  .cutinGirl {
-    max-width: 82%;
-    max-height: 280px;
-    object-fit: contain;
-    filter: drop-shadow(0 12px 20px rgba(0,0,0,0.35));
+  .historyOverlay {
+    background: rgba(0,0,0,0.55);
   }
 
   .historySheet {
@@ -406,6 +343,84 @@
     padding-top: 8px;
   }
 
+  .cutinOverlay {
+    background:
+      linear-gradient(180deg, rgba(8,8,12,0.92) 0%, rgba(8,8,12,0.82) 100%);
+  }
+
+  .cutinStage {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 18px 16px 28px;
+    gap: 18px;
+  }
+
+  .cutinSpeech {
+    width: min(92vw, 560px);
+    background: #fff;
+    color: #111;
+    border-radius: 26px;
+    padding: 16px 18px 18px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.28);
+  }
+
+  .cutinName {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #111;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .cutinText {
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1.5;
+    min-height: 54px;
+  }
+
+  .cutinDice {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 54px;
+  }
+
+  .cutinDiceEmoji {
+    font-size: 34px;
+  }
+
+  .cutinDiceNum {
+    font-size: 42px;
+    font-weight: 900;
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .cutinGirlWrap {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+  }
+
+  .cutinGirl {
+    max-width: min(88vw, 420px);
+    max-height: 52vh;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 24px rgba(0,0,0,0.4));
+  }
+
   .footerSpace {
     height: 10px;
   }
@@ -421,7 +436,7 @@
         <span>ゴール：20マス</span>
       </div>
       <div class="diceArea">
-        <div class="diceEmoji" id="diceEmoji">🎲</div>
+        <div class="diceEmoji">🎲</div>
         <div class="diceNum" id="diceNum">-</div>
       </div>
       <div class="subInfo" id="subInfo">サイコロをふる</div>
@@ -449,10 +464,14 @@
   </div>
 
   <div class="cutinOverlay" id="cutinOverlay">
-    <div class="cutinBox">
+    <div class="cutinStage">
       <div class="cutinSpeech">
         <div class="cutinName" id="cutinName">チー娘A</div>
-        <div id="cutinText">いくよ。</div>
+        <div class="cutinText" id="cutinText">いくよ。</div>
+        <div class="cutinDice">
+          <div class="cutinDiceEmoji">🎲</div>
+          <div class="cutinDiceNum" id="cutinDiceNum">-</div>
+        </div>
       </div>
       <div class="cutinGirlWrap">
         <img src="girl1.png" alt="チー娘" class="cutinGirl" id="cutinGirl">
@@ -484,8 +503,9 @@
     {
       name: "チー娘A",
       image: "girl1.png",
-      yourTurn: ["あなたの番だよ。", "どれ出るかな。", "いいの出るかも。"],
-      cpuTurn: ["私の番だね。", "進めるだけ進むよ。", "のんびり勝ちに行く。"],
+      yourTurn: ["あなたの番だよ。", "どれ出るかな。", "振ってみよっか。"],
+      cpuTurn: ["私の番だね。", "私が振るよ。", "いくよ。"],
+      rolling: ["ころころ…", "振るよ。", "せーの。"],
       move: ["いい感じ。", "まあまあ進んだね。", "その調子。"],
       plus: ["ちょっと得したね。", "ラッキーだよ。", "進んでいいよ。"],
       minus: ["ちょっと戻ろっか。", "少しだけ下がるね。", "ここは戻るみたい。"],
@@ -496,8 +516,9 @@
     {
       name: "チー娘B",
       image: "girl2.png",
-      yourTurn: ["ほら、あなたの番。", "ちゃんと振ってよね。", "どうせなら大きいの出して。"],
-      cpuTurn: ["私の番ね。", "見てなさい。", "普通に進むだけ。"],
+      yourTurn: ["ほら、あなたの番。", "ちゃんと見ててよね。", "私が振るから。"],
+      cpuTurn: ["私の番ね。", "見てなさい。", "振るよ。"],
+      rolling: ["いくよ。", "ころっ。", "出るかな。"],
       move: ["悪くない。", "まあ、こんなもんかな。", "まだこれからでしょ。"],
       plus: ["ちょっと運いいじゃん。", "はい、進んでいいよ。", "ラッキーなんじゃない？"],
       minus: ["少し戻るみたい。", "まあ、そういう時もある。", "戻ってね。"],
@@ -508,8 +529,9 @@
     {
       name: "チー娘C",
       image: "girl3.png",
-      yourTurn: ["あなたの番。", "振って。", "……どうなるかな。"],
+      yourTurn: ["あなたの番。", "振る。", "……見てて。"],
       cpuTurn: ["私が振る。", "いく。", "……出る。"],
+      rolling: ["ころ。", "……いく。", "出る。"],
       move: ["進んだ。", "悪くない。", "まだ行ける。"],
       plus: ["さらに進む。", "得した。", "前へ。"],
       minus: ["少し下がる。", "戻る。", "……しかたない。"],
@@ -531,7 +553,7 @@
   let turnIndex = 0;
   let gameEnded = false;
   let historyLogs = [];
-  let cutinTimer = null;
+  let busy = false;
 
   const boardEl = document.getElementById("board");
   const rankingBodyEl = document.getElementById("rankingBody");
@@ -547,6 +569,7 @@
   const cutinName = document.getElementById("cutinName");
   const cutinText = document.getElementById("cutinText");
   const cutinGirl = document.getElementById("cutinGirl");
+  const cutinDiceNum = document.getElementById("cutinDiceNum");
 
   const historyOverlay = document.getElementById("historyOverlay");
   const historyBody = document.getElementById("historyBody");
@@ -556,15 +579,15 @@
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   function getGirlIndexForTurn(player) {
     if (player.type === "human") {
       return Math.floor(Math.random() * 3);
     }
     return player.girlIndex;
-  }
-
-  function getTokenClass(id) {
-    return id;
   }
 
   function addHistory(text) {
@@ -591,6 +614,7 @@
   }
 
   function openHistory() {
+    if (busy) return;
     historyOverlay.classList.add("show");
   }
 
@@ -598,18 +622,12 @@
     historyOverlay.classList.remove("show");
   }
 
-  function showCutin(girlIndex, text, keep = false) {
-    clearTimeout(cutinTimer);
+  function showCutin(girlIndex, text, diceText = "-") {
     cutinName.textContent = girls[girlIndex].name;
     cutinText.textContent = text;
     cutinGirl.src = girls[girlIndex].image;
+    cutinDiceNum.textContent = diceText;
     cutinOverlay.classList.add("show");
-
-    if (!keep) {
-      cutinTimer = setTimeout(() => {
-        hideCutin();
-      }, 1300);
-    }
   }
 
   function hideCutin() {
@@ -648,7 +666,7 @@
       players.forEach(player => {
         if (player.pos === i) {
           const token = document.createElement("div");
-          token.className = `token ${getTokenClass(player.id)}`;
+          token.className = `token ${player.id}`;
           token.textContent = player.short;
           tokens.appendChild(token);
         }
@@ -684,38 +702,53 @@
     player.pos = Math.max(0, Math.min(GOAL, player.pos + amount));
   }
 
-  function handleWin(player, speakerGirl) {
+  function setBusy(flag) {
+    busy = flag;
+    rollBtn.disabled = flag || gameEnded;
+    resetBtn.disabled = flag;
+    historyBtn.disabled = flag;
+  }
+
+  async function showTurnIntro() {
+    if (gameEnded) return;
+
+    const current = players[turnIndex];
+    const girlIndex = getGirlIndexForTurn(current);
+
+    updateTurnLabel();
+    setSubInfo("サイコロをふる");
+
+    if (current.type === "human") {
+      showCutin(girlIndex, rand(girls[girlIndex].yourTurn));
+    } else {
+      showCutin(girlIndex, rand(girls[girlIndex].cpuTurn));
+    }
+
+    await wait(950);
+    hideCutin();
+    return girlIndex;
+  }
+
+  async function handleWin(player, speakerGirl) {
     gameEnded = true;
+    setBusy(false);
     rollBtn.disabled = true;
+    resetBtn.disabled = false;
+    historyBtn.disabled = false;
     updateRanking();
 
     if (player.type === "human") {
-      showCutin(speakerGirl, rand(girls[speakerGirl].winYou), true);
+      showCutin(speakerGirl, rand(girls[speakerGirl].winYou), "★");
       addHistory("あなたがゴールして勝利。");
       setSubInfo("あなたの勝ち");
     } else {
-      showCutin(speakerGirl, rand(girls[speakerGirl].winCpu), true);
+      showCutin(speakerGirl, rand(girls[speakerGirl].winCpu), "★");
       addHistory(`${player.label} がゴール。`);
       setSubInfo(`${player.label} の勝ち`);
     }
   }
 
-  function nextTurn() {
-    turnIndex = (turnIndex + 1) % players.length;
-    updateTurnLabel();
-    const current = players[turnIndex];
-    const girlIndex = getGirlIndexForTurn(current);
-
-    if (current.type === "human") {
-      showCutin(girlIndex, rand(girls[girlIndex].yourTurn));
-      setSubInfo("サイコロをふる");
-    } else {
-      showCutin(girlIndex, rand(girls[girlIndex].cpuTurn));
-      setSubInfo("サイコロをふる");
-    }
-  }
-
-  function processEvent(player, speakerGirl) {
+  async function processEvent(player, speakerGirl) {
     const event = eventMap[player.pos];
     if (!event || player.pos >= GOAL) return false;
 
@@ -724,12 +757,15 @@
       movePlayer(player, event.value);
       drawBoard();
       updateRanking();
-      showCutin(speakerGirl, rand(girls[speakerGirl].plus));
+      showCutin(speakerGirl, rand(girls[speakerGirl].plus), `+${event.value}`);
       addHistory(`${player.label} はイベントで ${event.value} マス進んだ（${before} → ${player.pos}）`);
       setSubInfo(`イベント：+${event.value}マス`);
+      await wait(1050);
 
       if (player.pos >= GOAL) {
-        handleWin(player, speakerGirl);
+        await handleWin(player, speakerGirl);
+      } else {
+        hideCutin();
       }
       return false;
     }
@@ -739,75 +775,91 @@
       movePlayer(player, -event.value);
       drawBoard();
       updateRanking();
-      showCutin(speakerGirl, rand(girls[speakerGirl].minus));
+      showCutin(speakerGirl, rand(girls[speakerGirl].minus), `-${event.value}`);
       addHistory(`${player.label} はイベントで ${event.value} マス戻った（${before} → ${player.pos}）`);
       setSubInfo(`イベント：-${event.value}マス`);
+      await wait(1050);
+      hideCutin();
       return false;
     }
 
     if (event.type === "again") {
-      showCutin(speakerGirl, rand(girls[speakerGirl].again));
+      showCutin(speakerGirl, rand(girls[speakerGirl].again), "↺");
       addHistory(`${player.label} はイベントでもう1回。`);
       setSubInfo("イベント：もう1回");
+      await wait(1050);
+      hideCutin();
       return true;
     }
 
     return false;
   }
 
-  function rollDice() {
-    if (gameEnded) return;
+  async function rollDice() {
+    if (gameEnded || busy) return;
+
+    setBusy(true);
 
     const player = players[turnIndex];
     const speakerGirl = getGirlIndexForTurn(player);
     const dice = Math.floor(Math.random() * 6) + 1;
     const before = player.pos;
 
-    diceNumEl.textContent = dice;
-    movePlayer(player, dice);
+    showCutin(speakerGirl, rand(girls[speakerGirl].rolling), "…");
+    setSubInfo("振っている…");
 
+    await wait(520);
+    cutinDiceNum.textContent = "🎲";
+    await wait(260);
+    cutinDiceNum.textContent = dice;
+    diceNumEl.textContent = dice;
+    cutinText.textContent = rand(girls[speakerGirl].move);
+
+    movePlayer(player, dice);
     drawBoard();
     updateRanking();
 
     addHistory(`${player.label} が ${dice} マス進んだ（${before} → ${player.pos}）`);
-    showCutin(speakerGirl, rand(girls[speakerGirl].move));
     setSubInfo(`${dice}マス進んだ`);
 
+    await wait(900);
+
     if (player.pos >= GOAL) {
-      handleWin(player, speakerGirl);
+      await handleWin(player, speakerGirl);
       return;
     }
 
-    const again = processEvent(player, speakerGirl);
+    const again = await processEvent(player, speakerGirl);
     if (gameEnded) return;
+
     if (again) {
+      setBusy(false);
       updateTurnLabel();
       return;
     }
 
-    setTimeout(() => {
-      if (!gameEnded) nextTurn();
-    }, 900);
+    hideCutin();
+    turnIndex = (turnIndex + 1) % players.length;
+    await wait(180);
+    setBusy(false);
+    await showTurnIntro();
   }
 
-  function resetGame() {
-    clearTimeout(cutinTimer);
+  async function resetGame() {
     players.forEach(p => p.pos = 0);
     turnIndex = 0;
     gameEnded = false;
     historyLogs = [];
-    rollBtn.disabled = false;
     diceNumEl.textContent = "-";
-    updateTurnLabel();
     drawBoard();
     updateRanking();
     renderHistory();
     hideCutin();
-
-    const girlIndex = Math.floor(Math.random() * 3);
-    showCutin(girlIndex, rand(girls[girlIndex].yourTurn));
+    setBusy(false);
+    updateTurnLabel();
     setSubInfo("サイコロをふる");
     addHistory("ゲーム開始。");
+    await showTurnIntro();
   }
 
   rollBtn.addEventListener("click", rollDice);
@@ -817,10 +869,6 @@
 
   historyOverlay.addEventListener("click", (e) => {
     if (e.target === historyOverlay) closeHistory();
-  });
-
-  cutinOverlay.addEventListener("click", () => {
-    hideCutin();
   });
 
   resetGame();
