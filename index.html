@@ -363,15 +363,15 @@
 
   .girlSpeech{
     width:min(95vw, 700px);
-    background:rgba(255,255,255,.58);
+    background:rgba(255,255,255,.22);
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter:blur(10px);
     color:#111;
     border-radius:30px;
     padding:18px 20px 22px;
     position:relative;
-    box-shadow:0 8px 24px rgba(0,0,0,.08);
-    border:1px solid rgba(255,255,255,.45);
+    box-shadow:0 8px 24px rgba(0,0,0,.05);
+    border:1px solid rgba(255,255,255,.25);
   }
 
   .girlSpeech::after{
@@ -384,8 +384,7 @@
     height:0;
     border-left:18px solid transparent;
     border-right:18px solid transparent;
-    border-top:18px solid rgba(255,255,255,.58);
-    filter:drop-shadow(0 2px 0 rgba(255,255,255,.18));
+    border-top:18px solid rgba(255,255,255,.22);
   }
 
   .girlName{
@@ -404,6 +403,31 @@
     font-weight:900;
     line-height:1.6;
     min-height:58px;
+  }
+
+  .girlAction{
+    margin-top:14px;
+    display:none;
+  }
+
+  .girlAction.show{
+    display:block;
+  }
+
+  .overlayRollBtn{
+    appearance:none;
+    border:none;
+    border-radius:999px;
+    padding:14px 18px;
+    width:100%;
+    font-size:16px;
+    font-weight:900;
+    color:#111;
+    background:rgba(255,255,255,.78);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    box-shadow:0 6px 16px rgba(0,0,0,.08);
+    cursor:pointer;
   }
 
   .girlImageWrap{
@@ -506,6 +530,9 @@
       <div class="girlSpeech">
         <div class="girlName" id="girlName">チー娘A</div>
         <div class="girlText" id="girlText">いくよ。</div>
+        <div class="girlAction" id="girlAction">
+          <button class="overlayRollBtn" id="overlayRollBtn" type="button">サイコロをふる</button>
+        </div>
       </div>
       <div class="girlImageWrap">
         <img src="girl1.png" alt="チー娘" class="girlImage" id="girlImage">
@@ -545,7 +572,7 @@
     {
       name:"チー娘A",
       image:"girl1.png",
-      introHuman:["あなたの番だよ。","押したら振るよ。","準備できたらどうぞ。"],
+      introHuman:["あなたの番だよ。","ここを押したら振るよ。","準備できたらどうぞ。"],
       introCpu:["いくよ。","始まるよ。","見てて。"],
       move:["いい感じ。","まあまあ進んだね。","その調子。"],
       plus:["ちょっと得したね。","ラッキーだよ。","進んでいいよ。"],
@@ -557,7 +584,7 @@
     {
       name:"チー娘B",
       image:"girl2.png",
-      introHuman:["ほら、あなたの番。","押したら始まるよ。","準備できた？"],
+      introHuman:["ほら、あなたの番。","ここを押したら始まるよ。","準備できた？"],
       introCpu:["ほら、始まるよ。","見てなさい。","出るかな。"],
       move:["悪くない。","まあ、こんなもんかな。","まだこれからでしょ。"],
       plus:["ちょっと運いいじゃん。","はい、進んでいいよ。","ラッキーなんじゃない？"],
@@ -569,7 +596,7 @@
     {
       name:"チー娘C",
       image:"girl3.png",
-      introHuman:["あなたの番。","押して。","……準備できたら。"],
+      introHuman:["あなたの番。","ここを押して。","……準備できたら。"],
       introCpu:["……いく。","始まる。","出る。"],
       move:["進んだ。","悪くない。","まだ行ける。"],
       plus:["さらに進む。","得した。","前へ。"],
@@ -609,6 +636,8 @@
   const girlNameEl = document.getElementById("girlName");
   const girlTextEl = document.getElementById("girlText");
   const girlImageEl = document.getElementById("girlImage");
+  const girlActionEl = document.getElementById("girlAction");
+  const overlayRollBtn = document.getElementById("overlayRollBtn");
 
   const diceOverlay = document.getElementById("diceOverlay");
   const diceLabelEl = document.getElementById("diceLabel");
@@ -634,7 +663,8 @@
   }
 
   function updateButtons(){
-    rollBtn.disabled = !(waitingForUserRoll && !busy && !gameEnded);
+    rollBtn.disabled = true;
+    overlayRollBtn.disabled = !(waitingForUserRoll && !busy && !gameEnded);
     historyBtn.disabled = busy;
   }
 
@@ -684,15 +714,17 @@
     historyOverlay.classList.remove("show");
   }
 
-  function showGirl(girlIndex, text){
+  function showGirl(girlIndex, text, showAction = false){
     girlNameEl.textContent = girls[girlIndex].name;
     girlTextEl.textContent = text;
     girlImageEl.src = girls[girlIndex].image;
+    girlActionEl.classList.toggle("show", showAction);
     girlOverlay.classList.add("show");
   }
 
   function hideGirl(){
     girlOverlay.classList.remove("show");
+    girlActionEl.classList.remove("show");
   }
 
   function showDice(label, value = "?"){
@@ -772,14 +804,14 @@
 
     if(player.type === "human"){
       waitingForUserRoll = true;
-      updateButtons();
       setSubInfo("あなたの番です");
-      showGirl(girlIndex, rand(girls[girlIndex].introHuman));
+      showGirl(girlIndex, rand(girls[girlIndex].introHuman), true);
+      updateButtons();
     } else {
       waitingForUserRoll = false;
       updateButtons();
       setSubInfo("チー娘の番です");
-      showGirl(girlIndex, rand(girls[girlIndex].introCpu));
+      showGirl(girlIndex, rand(girls[girlIndex].introCpu), false);
       await wait(1700);
       hideGirl();
       await wait(350);
@@ -788,7 +820,7 @@
   }
 
   async function showResultReaction(girlIndex, text){
-    showGirl(girlIndex, text);
+    showGirl(girlIndex, text, false);
     await wait(1700);
     hideGirl();
     await wait(280);
@@ -831,8 +863,8 @@
 
       if(player.type === "human"){
         waitingForUserRoll = true;
+        showGirl(girlIndex, rand(girls[girlIndex].introHuman), true);
         updateButtons();
-        showGirl(girlIndex, rand(girls[girlIndex].introHuman));
       } else {
         await wait(450);
         await introForCurrentTurn();
@@ -852,11 +884,11 @@
     if(player.type === "human"){
       addHistory("あなたがゴールして勝利。");
       setSubInfo("あなたの勝ち");
-      showGirl(girlIndex, rand(girls[girlIndex].winYou));
+      showGirl(girlIndex, rand(girls[girlIndex].winYou), false);
     } else {
       addHistory(`${player.label} がゴール。`);
       setSubInfo(`${player.label} の勝ち`);
-      showGirl(girlIndex, rand(girls[girlIndex].winCpu));
+      showGirl(girlIndex, rand(girls[girlIndex].winCpu), false);
     }
 
     showDice("ゴール", "★");
@@ -875,6 +907,8 @@
 
     waitingForUserRoll = false;
     updateButtons();
+    hideGirl();
+    await wait(250);
 
     showDice("サイコロ…", "?");
     await wait(350);
@@ -950,10 +984,13 @@
     await introForCurrentTurn();
   }
 
+  overlayRollBtn.addEventListener("click", async () => {
+    if(!waitingForUserRoll || busy || gameEnded) return;
+    await executeRoll();
+  });
+
   rollBtn.addEventListener("click", async () => {
     if(!waitingForUserRoll || busy || gameEnded) return;
-    hideGirl();
-    await wait(250);
     await executeRoll();
   });
 
