@@ -339,6 +339,7 @@
     padding-top:8px;
   }
 
+  /* 女の子全面 */
   .girlOverlay{
     background:#dcdcdc;
     z-index:100;
@@ -361,10 +362,11 @@
     -webkit-backdrop-filter:blur(10px);
     color:#111;
     border-radius:30px;
-    padding:18px 20px 20px;
+    padding:18px 20px 18px;
     position:relative;
     box-shadow:0 8px 24px rgba(0,0,0,.04);
     border:1px solid rgba(255,255,255,.18);
+    z-index:2;
   }
 
   .girlSpeech::after{
@@ -372,12 +374,12 @@
     position:absolute;
     left:50%;
     transform:translateX(-50%);
-    bottom:-16px;
+    bottom:-14px;
     width:0;
     height:0;
-    border-left:16px solid transparent;
-    border-right:16px solid transparent;
-    border-top:16px solid rgba(255,255,255,.12);
+    border-left:14px solid transparent;
+    border-right:14px solid transparent;
+    border-top:14px solid rgba(255,255,255,.12);
   }
 
   .girlName{
@@ -395,11 +397,11 @@
     font-size:18px;
     font-weight:900;
     line-height:1.6;
-    min-height:48px;
+    min-height:42px;
   }
 
   .girlAction{
-    margin-top:14px;
+    margin-top:12px;
     display:none;
   }
 
@@ -424,23 +426,25 @@
   }
 
   .girlImageWrap{
-    flex:1;
-    width:100%;
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    top:150px;
     display:flex;
-    align-items:flex-end;
+    align-items:flex-start;
     justify-content:center;
-    padding-top:10px;
     overflow:hidden;
   }
 
   .girlImage{
-    width:100vw;
-    max-width:none;
-    height:calc(100vh - 150px);
-    object-fit:cover;
-    object-position:center 12%;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    object-position:center top;
   }
 
+  /* サイコロ画面 */
   .diceOverlay{
     background:rgba(8,8,12,.92);
     z-index:110;
@@ -493,7 +497,7 @@
         <div class="diceEmoji">🎲</div>
         <div class="diceNum" id="diceNum">-</div>
       </div>
-      <div class="subInfo" id="subInfo">あなたの番を待っています</div>
+      <div class="subInfo" id="subInfo">ゲーム開始</div>
     </div>
 
     <div class="panel boardWrap">
