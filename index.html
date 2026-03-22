@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
+<title>チー娘すごろく</title>
+<style>
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0d0d0f;
+    color: #fff;
+    font-family: sans-serif;
+    width: 100%;
+    min-height: 100%;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100vh;
+    padding: 12px 10px 18px;
+    background:
+      radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 35%),
+      linear-gradient(180deg, #1a1a1f 0%, #0d0d0f 100%);
+  }
+
+  .title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    margin: 6px 0 12px;
+  }
+
+  .topArea {
+    position: relative;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 12px;
+    overflow: hidden;
+    min-height: 290px;
+  }
+
+  .speakerName {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    z-index: 3;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffd9f2;
+    background: rgba(0,0,0,0.45);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+
+  .speech {
+    position: absolute;
+    top: 44px;
+    left: 12px;
+    right: 12px;
+    z-index: 3;
+    min-height: 72px;
+    background: #fff;
+    color: #111;
+    border-radius: 18px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.5;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.28);
+  }
+
+  .speech::after {
+    content: "";
+    position: absolute;
+    left: 34px;
+    bottom: -12px;
+    border-width: 12px 10px 0 10px;
+    border-style: solid;
+    border-color: #fff transparent transparent transparent;
+  }
+
+  .girlStage {
+    position: relative;
+    height: 260px;
+    margin-top: 18px;
+  }
+
+  .girl {
+    position: absolute;
+    bottom: 0;
+    width: 31%;
+    max-height: 210px;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 18px rgba(0,0,0,0.35));
+    opacity: 0.45;
+    transform: scale(0.96);
+    transition: 0.25s ease;
+  }
+
+  .girl.active {
+    opacity: 1;
+    transform: scale(1);
+    z-index: 2;
+  }
+
+  .girl1 { left: 0; }
+  .girl2 { left: 34.5%; }
+  .girl3 { right: 0; }
+
+  .statusBox {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .turnRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .diceView {
+    text-align: center;
+    font-size: 40px;
+    font-weight: 900;
+    margin: 10px 0 8px;
+    line-height: 1;
+  }
+
+  .boardWrap {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .boardTitle {
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+
+  .cell {
+    position: relative;
+    min-height: 58px;
+    border-radius: 12px;
+    background: #1f1f26;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .cell.goal {
+    background: linear-gradient(180deg, #5f4d00, #2a2200);
+    border-color: rgba(255,220,120,0.45);
+  }
+
+  .cellNum {
+    font-size: 11px;
+    opacity: 0.9;
+    font-weight: 800;
+  }
+
+  .tokens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 28px;
+  }
+
+  .token {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111;
+  }
+
+  .t-you { background: #ffffff; }
+  .t-a { background: #ffb6d9; }
+  .t-b { background: #b6dcff; }
+  .t-c { background: #c9ffb6; }
+
+  .controls {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+
+  button {
+    appearance: none;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 12px;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  #rollBtn {
+    flex: 1;
+    background: #ffffff;
+    color: #111;
+  }
+
+  #resetBtn {
+    width: 96px;
+    background: #2b2b34;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .ranking {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .rankingTitle {
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .rankLine {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .logBox {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .logTitle {
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .log {
+    max-height: 180px;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.92);
+  }
+
+  .logLine {
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .footerNote {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 11px;
+    opacity: 0.55;
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="title">チー娘すごろく</div>
+
+    <div class="topArea">
+      <div class="speakerName" id="speakerName">チー娘A</div>
+      <div class="speech" id="speech">すごろく、始めるよ。</div>
+
+      <div class="girlStage">
+        <img src="girl1.png" alt="チー娘A" class="girl girl1 active" id="girl0">
+        <img src="girl2.png" alt="チー娘B" class="girl girl2" id="girl1">
+        <img src="girl3.png" alt="チー娘C" class="girl girl3" id="girl2">
+      </div>
+    </div>
+
+    <div class="statusBox">
+      <div class="turnRow">
+        <div id="turnText">現在の番：あなた</div>
+        <div id="goalText">ゴール：20マス</div>
+      </div>
+      <div class="diceView" id="diceView">🎲</div>
+    </div>
+
+    <div class="boardWrap">
+      <div class="boardTitle">盤面</div>
+      <div class="board" id="board"></div>
+    </div>
+
+    <div class="controls">
+      <button id="rollBtn">サイコロをふる</button>
+      <button id="resetBtn">リセット</button>
+    </div>
+
+    <div class="ranking">
+      <div class="rankingTitle">順位</div>
+      <div id="rankingBody"></div>
+    </div>
+
+    <div class="logBox">
+      <div class="logTitle">ログ</div>
+      <div class="log" id="log"></div>
+    </div>
+
+    <div class="footerNote">
+      画像ファイル名：girl1.png / girl2.png / girl3.png
+    </div>
+  </div>
+
+<script>
+  const GOAL = 20;
+
+  const players = [
+    {
+      id: "you",
+      label: "あなた",
+      short: "自",
+      pos: 0,
+      type: "human"
+    },
+    {
+      id: "a",
+      label: "チー娘A",
+      short: "A",
+      pos: 0,
+      type: "cpu",
+      girlIndex: 0
+    },
+    {
+      id: "b",
+      label: "チー娘B",
+      short: "B",
+      pos: 0,
+      type: "cpu",
+      girlIndex: 1
+    },
+    {
+      id: "c",
+      label: "チー娘C",
+      short: "C",
+      pos: 0,
+      type: "cpu",
+      girlIndex: 2
+    }
+  ];
+
+  const girlNames = ["チー娘A", "チー娘B", "チー娘C"];
+
+  const girlTalks = {
+    0: {
+      start: [
+        "すごろく、始めるよ。",
+        "のんびり行こっか。",
+        "今日は私も勝つ気あるよ。"
+      ],
+      yourTurn: [
+        "はい、あなたの番だよ。",
+        "どれ出るかな？",
+        "いい数字、出るかもね。"
+      ],
+      cpuTurn: [
+        "私の番だね。",
+        "進めるだけ進むよ。",
+        "ゆるく行くけど勝つよ。"
+      ],
+      move: [
+        "まあまあ進んだね。",
+        "いい感じかも。",
+        "その調子。"
+      ],
+      win: [
+        "やった、私が1番。",
+        "勝っちゃった。",
+        "ふふ、先にゴール。"
+      ]
+    },
+    1: {
+      start: [
+        "別に本気ってわけじゃないけど。",
+        "始めるなら始めるよ。",
+        "負ける気はないかな。"
+      ],
+      yourTurn: [
+        "ほら、あなたの番。",
+        "ちゃんと振ってよね。",
+        "変なの出さないでよ？"
+      ],
+      cpuTurn: [
+        "私の番ね。",
+        "見てなさい。",
+        "普通に進むだけ。"
+      ],
+      move: [
+        "悪くない。",
+        "まあ、こんなもんかな。",
+        "まだこれからでしょ。"
+      ],
+      win: [
+        "私の勝ち。まあ当然かな。",
+        "先に着いたけど？",
+        "ほらね、勝った。"
+      ]
+    },
+    2: {
+      start: [
+        "……始まる。",
+        "静かにやろ。",
+        "出目しだい。"
+      ],
+      yourTurn: [
+        "あなたの番。",
+        "振って。",
+        "……どうなるかな。"
+      ],
+      cpuTurn: [
+        "私が振る。",
+        "いく。",
+        "……出る。"
+      ],
+      move: [
+        "進んだ。",
+        "悪くない。",
+        "まだ行ける。"
+      ],
+      win: [
+        "ゴール。私の勝ち。",
+        "……先だった。",
+        "終わり。勝った。"
+      ]
+    }
+  };
+
+  let turnIndex = 0;
+  let gameEnded = false;
+
+  const boardEl = document.getElementById("board");
+  const logEl = document.getElementById("log");
+  const speechEl = document.getElementById("speech");
+  const speakerNameEl = document.getElementById("speakerName");
+  const diceViewEl = document.getElementById("diceView");
+  const turnTextEl = document.getElementById("turnText");
+  const rankingBodyEl = document.getElementById("rankingBody");
+  const rollBtn = document.getElementById("rollBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  function rand(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function getTokenClass(id) {
+    if (id === "you") return "t-you";
+    if (id === "a") return "t-a";
+    if (id === "b") return "t-b";
+    return "t-c";
+  }
+
+  function addLog(text) {
+    const div = document.createElement("div");
+    div.className = "logLine";
+    div.textContent = text;
+    logEl.prepend(div);
+  }
+
+  function drawBoard() {
+    boardEl.innerHTML = "";
+
+    for (let i = 0; i <= GOAL; i++) {
+      const cell = document.createElement("div");
+      cell.className = "cell" + (i === GOAL ? " goal" : "");
+
+      const num = document.createElement("div");
+      num.className = "cellNum";
+      num.textContent = i === GOAL ? `GOAL` : i;
+      cell.appendChild(num);
+
+      const tokens = document.createElement("div");
+      tokens.className = "tokens";
+
+      players.forEach(player => {
+        if (player.pos === i) {
+          const token = document.createElement("div");
+          token.className = `token ${getTokenClass(player.id)}`;
+          token.textContent = player.short;
+          tokens.appendChild(token);
+        }
+      });
+
+      cell.appendChild(tokens);
+      boardEl.appendChild(cell);
+    }
+  }
+
+  function updateRanking() {
+    const sorted = [...players].sort((a, b) => b.pos - a.pos);
+    rankingBodyEl.innerHTML = "";
+    sorted.forEach((p, idx) => {
+      const row = document.createElement("div");
+      row.className = "rankLine";
+      row.innerHTML = `<span>${idx + 1}位　${p.label}</span><span>${p.pos} / ${GOAL}</span>`;
+      rankingBodyEl.appendChild(row);
+    });
+  }
+
+  function setSpeaker(girlIndex, text) {
+    speakerNameEl.textContent = girlNames[girlIndex];
+    speechEl.textContent = text;
+
+    for (let i = 0; i < 3; i++) {
+      document.getElementById(`girl${i}`).classList.toggle("active", i === girlIndex);
+    }
+  }
+
+  function getSpeakerForCurrentTurn() {
+    const current = players[turnIndex];
+    if (current.type === "human") {
+      return Math.floor(Math.random() * 3);
+    }
+    return current.girlIndex;
+  }
+
+  function showTurnMessage() {
+    const current = players[turnIndex];
+    const speaker = getSpeakerForCurrentTurn();
+
+    if (current.type === "human") {
+      setSpeaker(speaker, rand(girlTalks[speaker].yourTurn));
+      turnTextEl.textContent = `現在の番：あなた`;
+    } else {
+      setSpeaker(speaker, rand(girlTalks[speaker].cpuTurn));
+      turnTextEl.textContent = `現在の番：${current.label}`;
+    }
+  }
+
+  function rollDice() {
+    if (gameEnded) return;
+
+    const current = players[turnIndex];
+    const speaker = getSpeakerForCurrentTurn();
+    const dice = Math.floor(Math.random() * 6) + 1;
+
+    diceViewEl.textContent = `🎲 ${dice}`;
+
+    const oldPos = current.pos;
+    current.pos = Math.min(GOAL, current.pos + dice);
+
+    if (current.type === "human") {
+      setSpeaker(speaker, `${rand(girlTalks[speaker].move)}　${dice}マス進んだよ。`);
+      addLog(`あなた が ${dice}マス進んだ（${oldPos} → ${current.pos}）`);
+    } else {
+      setSpeaker(speaker, `${rand(girlTalks[speaker].move)}　${dice}マス進む。`);
+      addLog(`${current.label} が ${dice}マス進んだ（${oldPos} → ${current.pos}）`);
+    }
+
+    drawBoard();
+    updateRanking();
+
+    if (current.pos >= GOAL) {
+      gameEnded = true;
+      rollBtn.disabled = true;
+
+      if (current.type === "human") {
+        const winSpeaker = Math.floor(Math.random() * 3);
+        setSpeaker(winSpeaker, "ゴール。あなたの勝ちだよ。");
+        addLog("あなたがゴールしました。勝利！");
+      } else {
+        setSpeaker(speaker, rand(girlTalks[speaker].win));
+        addLog(`${current.label} がゴールしました。`);
+      }
+
+      turnTextEl.textContent = `結果：${current.label} の勝ち`;
+      return;
+    }
+
+    turnIndex = (turnIndex + 1) % players.length;
+    showTurnMessage();
+  }
+
+  function resetGame() {
+    players.forEach(p => p.pos = 0);
+    turnIndex = 0;
+    gameEnded = false;
+    rollBtn.disabled = false;
+    logEl.innerHTML = "";
+    diceViewEl.textContent = "🎲";
+    drawBoard();
+    updateRanking();
+
+    const startSpeaker = Math.floor(Math.random() * 3);
+    setSpeaker(startSpeaker, rand(girlTalks[startSpeaker].start));
+    addLog("ゲームを開始しました。");
+    showTurnMessage();
+  }
+
+  rollBtn.addEventListener("click", rollDice);
+  resetBtn.addEventListener("click", resetGame);
+
+  resetGame();
+</script>
+</body>
+</html>
