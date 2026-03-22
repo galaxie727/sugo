@@ -267,7 +267,7 @@
     z-index:90;
     opacity:0;
     pointer-events:none;
-    transition:opacity .22s ease;
+    transition:opacity .28s ease;
   }
 
   .historyOverlay.show,
@@ -291,7 +291,7 @@
     background:#14151c;
     border-radius:24px 24px 0 0;
     border:1px solid rgba(255,255,255,.07);
-    transition:bottom .28s ease;
+    transition:bottom .35s ease;
     display:flex;
     flex-direction:column;
     overflow:hidden;
@@ -345,8 +345,9 @@
     padding-top:8px;
   }
 
+  /* 女の子カットイン */
   .girlOverlay{
-    background:#e6e6e6;
+    background:#e7e7e7;
     z-index:100;
   }
 
@@ -361,11 +362,11 @@
   }
 
   .girlSpeech{
-    width:min(92vw, 620px);
+    width:min(92vw, 660px);
     background:#fff;
     color:#111;
-    border-radius:28px;
-    padding:18px 18px 20px;
+    border-radius:30px;
+    padding:18px 20px 22px;
     position:relative;
     box-shadow:0 10px 26px rgba(0,0,0,.12);
   }
@@ -378,15 +379,15 @@
     bottom:-18px;
     width:0;
     height:0;
-    border-left:16px solid transparent;
-    border-right:16px solid transparent;
+    border-left:18px solid transparent;
+    border-right:18px solid transparent;
     border-top:18px solid #fff;
   }
 
   .girlName{
     display:inline-block;
-    margin-bottom:12px;
-    padding:7px 14px;
+    margin-bottom:14px;
+    padding:8px 15px;
     border-radius:999px;
     background:#111;
     color:#fff;
@@ -397,8 +398,8 @@
   .girlText{
     font-size:18px;
     font-weight:900;
-    line-height:1.55;
-    min-height:60px;
+    line-height:1.6;
+    min-height:58px;
   }
 
   .girlImageWrap{
@@ -407,17 +408,19 @@
     display:flex;
     align-items:flex-end;
     justify-content:center;
-    padding-top:28px;
+    padding-top:26px;
   }
 
   .girlImage{
-    max-width:min(92vw, 430px);
-    max-height:68vh;
+    width:min(92vw, 430px);
+    height:72vh;
     object-fit:contain;
+    object-position:center bottom;
   }
 
+  /* サイコロ画面 */
   .diceOverlay{
-    background:rgba(8,8,12,.9);
+    background:rgba(8,8,12,.92);
     z-index:110;
   }
 
@@ -428,14 +431,14 @@
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap:18px;
+    gap:24px;
     padding:24px;
   }
 
   .diceLabel{
-    font-size:18px;
+    font-size:20px;
     font-weight:900;
-    opacity:.92;
+    opacity:.95;
   }
 
   .diceBig{
@@ -444,7 +447,7 @@
   }
 
   .diceResult{
-    font-size:80px;
+    font-size:84px;
     font-weight:900;
     line-height:1;
     min-height:92px;
@@ -749,27 +752,27 @@
 
   async function showIntroAndRoll(player, girlIndex){
     showGirl(girlIndex, rand(girls[girlIndex].intro));
-    await wait(1200);
+    await wait(1700);
     hideGirl();
-    await wait(180);
+    await wait(350);
 
     showDice("サイコロ…", "?");
-    await wait(250);
+    await wait(350);
     diceResultEl.textContent = "1";
-    await wait(120);
+    await wait(220);
     diceResultEl.textContent = "4";
-    await wait(120);
+    await wait(220);
     diceResultEl.textContent = "2";
-    await wait(120);
+    await wait(220);
     diceResultEl.textContent = "6";
-    await wait(150);
+    await wait(260);
   }
 
   async function showResultReaction(girlIndex, text){
     showGirl(girlIndex, text);
-    await wait(1150);
+    await wait(1700);
     hideGirl();
-    await wait(150);
+    await wait(280);
   }
 
   async function handleEvent(player, girlIndex){
@@ -849,8 +852,9 @@
     diceResultEl.textContent = dice;
     diceNumEl.textContent = dice;
     setSubInfo(`${dice}マス進んだ`);
-    await wait(700);
+    await wait(1100);
     hideDice();
+    await wait(150);
 
     movePlayer(player, dice);
     drawBoard();
@@ -869,7 +873,7 @@
 
     if(again){
       setBusy(false);
-      await wait(250);
+      await wait(500);
       playTurn();
       return;
     }
@@ -879,7 +883,7 @@
     setSubInfo("次の番へ");
     setBusy(false);
 
-    await wait(350);
+    await wait(700);
     playTurn();
   }
 
@@ -899,7 +903,7 @@
     updateTurnLabel();
     setSubInfo("自動進行中");
     addHistory("ゲーム開始。");
-    await wait(500);
+    await wait(900);
     playTurn();
   }
 
