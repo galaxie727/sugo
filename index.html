@@ -137,6 +137,7 @@
     position:relative;
     overflow:hidden;
     padding:8px 6px 6px;
+    transition:transform .12s ease, box-shadow .12s ease;
   }
 
   .cell.goal{
@@ -154,6 +155,13 @@
 
   .cell.event-again{
     box-shadow:inset 0 0 0 1px rgba(140,200,255,.16);
+  }
+
+  .cell.active-step{
+    transform:scale(1.03);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.16),
+      0 0 0 2px rgba(255,255,255,.08);
   }
 
   .cellNum{
@@ -194,6 +202,7 @@
     font-size:12px;
     font-weight:900;
     color:#111;
+    transition:transform .12s ease;
   }
 
   .you{ background:#fff; }
@@ -332,7 +341,6 @@
     padding-top:8px;
   }
 
-  /* ===== 女の子全画面UI ===== */
   .girlOverlay{
     z-index:100;
     background:#000;
@@ -429,7 +437,6 @@
     opacity:.45;
   }
 
-  /* サイコロ画面 */
   .diceOverlay{
     background:rgba(8,8,12,.92);
     z-index:110;
@@ -543,6 +550,7 @@
 
 <script>
   const GOAL = 20;
+  const STEP_DELAY = 260;
 
   const players = [
     { id:"you", label:"あなた", short:"自", pos:0, type:"human" },
@@ -605,6 +613,7 @@
   let historyLogs = [];
   let waitingForUserRoll = false;
   let currentSpeakerGirl = 0;
+  let activeStepCell = null;
 
   const boardEl = document.getElementById("board");
   const rankingBodyEl = document.getElementById("rankingBody");
@@ -722,6 +731,13 @@
     player.pos = Math.max(0, Math.min(GOAL, player.pos + amount));
   }
 
+  function clearActiveStep(){
+    activeStepCell = null;
+    document.querySelectorAll(".cell.active-step").forEach(el => {
+      el.classList.remove("active-step");
+    });
+  }
+
   function drawBoard(){
     boardEl.innerHTML = "";
 
@@ -732,6 +748,7 @@
       if(eventMap[i]?.type === "plus") cls += " event-plus";
       if(eventMap[i]?.type === "minus") cls += " event-minus";
       if(eventMap[i]?.type === "again") cls += " event-again";
+      if(activeStepCell === i) cls += " active-step";
       cell.className = cls;
 
       const num = document.createElement("div");
@@ -777,6 +794,24 @@
     });
   }
 
+  async function animateMove(player, steps){
+    if(steps <= 0) return;
+
+    for(let i = 0; i < steps; i++){
+      if(player.pos >= GOAL) break;
+      player.pos += 1;
+      activeStepCell = player.pos;
+      drawBoard();
+      updateRanking();
+      setSubInfo(`${player.label} が ${player.pos} マス目へ`);
+      await wait(STEP_DELAY);
+    }
+
+    clearActiveStep();
+    drawBoard();
+    updateRanking();
+  }
+
   async function introForCurrentTurn(){
     const player = players[turnIndex];
     const girlIndex = getGirlIndexForTurn(player);
@@ -813,10 +848,8 @@
 
     if(event.type === "plus"){
       const before = player.pos;
-      movePlayer(player, event.value);
-      drawBoard();
-      updateRanking();
       setSubInfo(`イベント：+${event.value}マス`);
+      await animateMove(player, event.value);
       addHistory(`${player.label} はイベントで ${event.value} マス進んだ（${before} → ${player.pos}）`);
       await showResultReaction(girlIndex, rand(girls[girlIndex].plus));
 
@@ -828,7 +861,12 @@
 
     if(event.type === "minus"){
       const before = player.pos;
-      movePlayer(player, -event.value);
+      player.pos = Math.max(0, player.pos - event.value);
+      activeStepCell = player.pos;
+      drawBoard();
+      updateRanking();
+      await wait(350);
+      clearActiveStep();
       drawBoard();
       updateRanking();
       setSubInfo(`イベント：-${event.value}マス`);
@@ -903,15 +941,14 @@
     const dice = Math.floor(Math.random() * 6) + 1;
     diceResultEl.textContent = dice;
     diceNumEl.textContent = dice;
-    setSubInfo(`${dice}マス進んだ`);
-    await wait(1100);
+    setSubInfo(`${dice}マス進む`);
+    await wait(900);
     hideDice();
     await wait(150);
 
-    movePlayer(player, dice);
-    drawBoard();
-    updateRanking();
+    await animateMove(player, dice);
     addHistory(`${player.label} が ${dice} マス進んだ（${before} → ${player.pos}）`);
+    setSubInfo(`${player.pos} マス目に到着`);
 
     await showResultReaction(girlIndex, rand(girls[girlIndex].move));
 
@@ -940,6 +977,7 @@
   async function resetGame(){
     hideGirl();
     hideDice();
+    clearActiveStep();
     players.forEach(p => p.pos = 0);
     turnIndex = 0;
     gameEnded = false;
