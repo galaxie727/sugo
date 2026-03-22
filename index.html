@@ -5,424 +5,453 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
 <title>チー娘すごろく</title>
 <style>
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+  *{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
   }
 
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100%;
-    background: #0d0d12;
-    color: #fff;
-    font-family: sans-serif;
+  html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+    background:#0d0d12;
+    color:#fff;
+    font-family:sans-serif;
   }
 
-  body {
-    display: flex;
-    justify-content: center;
+  body{
+    display:flex;
+    justify-content:center;
   }
 
-  .app {
-    width: 100%;
-    max-width: 430px;
-    min-height: 100vh;
-    padding: 14px 10px 20px;
+  .app{
+    width:100%;
+    max-width:430px;
+    min-height:100vh;
+    padding:14px 10px 20px;
     background:
       radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 35%),
       linear-gradient(180deg, #1a1b22 0%, #0d0d12 100%);
-    position: relative;
-    overflow: hidden;
+    position:relative;
+    overflow:hidden;
   }
 
-  .title {
-    text-align: center;
-    font-size: 24px;
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    margin: 4px 0 12px;
+  .title{
+    text-align:center;
+    font-size:24px;
+    font-weight:900;
+    letter-spacing:.08em;
+    margin:4px 0 12px;
   }
 
-  .panel {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 22px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  .panel{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:22px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
   }
 
-  .statusBox {
-    padding: 14px 14px 10px;
-    margin-bottom: 12px;
+  .statusBox{
+    padding:14px 14px 10px;
+    margin-bottom:12px;
   }
 
-  .statusTop {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 800;
-    margin-bottom: 10px;
+  .statusTop{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    font-size:14px;
+    font-weight:800;
+    margin-bottom:10px;
   }
 
-  .diceArea {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    min-height: 74px;
-    font-weight: 900;
+  .diceArea{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    min-height:74px;
+    font-weight:900;
   }
 
-  .diceEmoji {
-    font-size: 44px;
-    line-height: 1;
+  .diceEmoji{
+    font-size:44px;
+    line-height:1;
   }
 
-  .diceNum {
-    font-size: 58px;
-    line-height: 1;
-    min-width: 48px;
-    text-align: center;
+  .diceNum{
+    font-size:58px;
+    line-height:1;
+    min-width:48px;
+    text-align:center;
   }
 
-  .subInfo {
-    margin-top: 8px;
-    text-align: center;
-    font-size: 12px;
-    opacity: 0.72;
-    min-height: 18px;
+  .subInfo{
+    margin-top:8px;
+    text-align:center;
+    font-size:12px;
+    opacity:.72;
+    min-height:18px;
   }
 
-  .boardWrap {
-    padding: 12px;
-    margin-bottom: 12px;
+  .boardWrap{
+    padding:12px;
+    margin-bottom:12px;
   }
 
-  .boardTitleRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+  .boardTitleRow{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
   }
 
-  .boardTitle {
-    font-size: 14px;
-    font-weight: 900;
+  .boardTitle{
+    font-size:14px;
+    font-weight:900;
   }
 
-  .miniBtn {
-    appearance: none;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.05);
-    color: #fff;
-    border-radius: 999px;
-    padding: 8px 12px;
-    font-size: 12px;
-    font-weight: 800;
-    cursor: pointer;
+  .miniBtn{
+    appearance:none;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.05);
+    color:#fff;
+    border-radius:999px;
+    padding:8px 12px;
+    font-size:12px;
+    font-weight:800;
+    cursor:pointer;
   }
 
-  .board {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 7px;
+  .board{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:7px;
   }
 
-  .cell {
-    min-height: 78px;
-    border-radius: 16px;
-    background: #181922;
-    border: 1px solid rgba(255,255,255,0.06);
-    position: relative;
-    overflow: hidden;
-    padding: 8px 6px 6px;
+  .cell{
+    min-height:78px;
+    border-radius:16px;
+    background:#181922;
+    border:1px solid rgba(255,255,255,.06);
+    position:relative;
+    overflow:hidden;
+    padding:8px 6px 6px;
   }
 
-  .cell.goal {
-    background: linear-gradient(180deg, #5c4a00 0%, #2c2400 100%);
-    border-color: rgba(255,220,120,0.35);
+  .cell.goal{
+    background:linear-gradient(180deg, #5c4a00 0%, #2c2400 100%);
+    border-color:rgba(255,220,120,.35);
   }
 
-  .cell.event-plus {
-    box-shadow: inset 0 0 0 1px rgba(120,255,160,0.18);
+  .cell.event-plus{
+    box-shadow:inset 0 0 0 1px rgba(120,255,160,.18);
   }
 
-  .cell.event-minus {
-    box-shadow: inset 0 0 0 1px rgba(255,140,140,0.16);
+  .cell.event-minus{
+    box-shadow:inset 0 0 0 1px rgba(255,140,140,.16);
   }
 
-  .cell.event-again {
-    box-shadow: inset 0 0 0 1px rgba(140,200,255,0.16);
+  .cell.event-again{
+    box-shadow:inset 0 0 0 1px rgba(140,200,255,.16);
   }
 
-  .cellNum {
-    font-size: 11px;
-    font-weight: 900;
-    opacity: 0.95;
+  .cellNum{
+    font-size:11px;
+    font-weight:900;
+    opacity:.95;
   }
 
-  .eventMark {
-    position: absolute;
-    right: 6px;
-    top: 6px;
-    font-size: 12px;
-    font-weight: 900;
-    opacity: 0.92;
+  .eventMark{
+    position:absolute;
+    right:6px;
+    top:6px;
+    font-size:12px;
+    font-weight:900;
+    opacity:.92;
   }
 
-  .tokens {
-    position: absolute;
-    left: 6px;
-    right: 6px;
-    bottom: 6px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    min-height: 24px;
-    align-items: flex-end;
+  .tokens{
+    position:absolute;
+    left:6px;
+    right:6px;
+    bottom:6px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+    min-height:24px;
+    align-items:flex-end;
   }
 
-  .token {
-    min-width: 23px;
-    height: 23px;
-    padding: 0 6px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 900;
-    color: #111;
+  .token{
+    min-width:23px;
+    height:23px;
+    padding:0 6px;
+    border-radius:999px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    font-weight:900;
+    color:#111;
   }
 
-  .you { background: #fff; }
-  .a { background: #ffbfdc; }
-  .b { background: #bedcff; }
-  .c { background: #d6ffb8; }
+  .you{ background:#fff; }
+  .a{ background:#ffbfdc; }
+  .b{ background:#bedcff; }
+  .c{ background:#d6ffb8; }
 
-  .controls {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
+  .controls{
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
   }
 
-  .mainBtn {
-    appearance: none;
-    border: none;
-    border-radius: 18px;
-    padding: 15px 14px;
-    font-size: 16px;
-    font-weight: 900;
-    cursor: pointer;
+  .mainBtn{
+    appearance:none;
+    border:none;
+    border-radius:18px;
+    padding:15px 14px;
+    font-size:16px;
+    font-weight:900;
+    cursor:pointer;
   }
 
-  #rollBtn {
-    flex: 1;
-    background: #ffffff;
-    color: #111;
+  #autoBtn{
+    flex:1;
+    background:#ffffff;
+    color:#111;
   }
 
-  #resetBtn {
-    width: 100px;
-    background: #272935;
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.08);
+  #resetBtn{
+    width:100px;
+    background:#272935;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.08);
   }
 
-  button:disabled {
-    opacity: 0.48;
-    cursor: default;
+  button:disabled{
+    opacity:.48;
+    cursor:default;
   }
 
-  .ranking {
-    padding: 12px;
+  .ranking{
+    padding:12px;
   }
 
-  .rankingTitle {
-    font-size: 14px;
-    font-weight: 900;
-    margin-bottom: 8px;
+  .rankingTitle{
+    font-size:14px;
+    font-weight:900;
+    margin-bottom:8px;
   }
 
-  .rankLine {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 9px 10px;
-    margin-bottom: 6px;
-    border-radius: 13px;
-    background: rgba(255,255,255,0.04);
-    font-size: 13px;
-    font-weight: 800;
+  .rankLine{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:9px 10px;
+    margin-bottom:6px;
+    border-radius:13px;
+    background:rgba(255,255,255,.04);
+    font-size:13px;
+    font-weight:800;
   }
 
   .historyOverlay,
-  .cutinOverlay {
-    position: fixed;
-    inset: 0;
-    z-index: 80;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.22s ease;
+  .girlOverlay,
+  .diceOverlay{
+    position:fixed;
+    inset:0;
+    z-index:90;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .22s ease;
   }
 
   .historyOverlay.show,
-  .cutinOverlay.show {
-    opacity: 1;
-    pointer-events: auto;
+  .girlOverlay.show,
+  .diceOverlay.show{
+    opacity:1;
+    pointer-events:auto;
   }
 
-  .historyOverlay {
-    background: rgba(0,0,0,0.55);
+  .historyOverlay{
+    background:rgba(0,0,0,.55);
   }
 
-  .historySheet {
-    position: absolute;
-    left: 50%;
-    bottom: -82vh;
-    transform: translateX(-50%);
-    width: min(92vw, 430px);
-    height: 74vh;
-    background: #14151c;
-    border-radius: 24px 24px 0 0;
-    border: 1px solid rgba(255,255,255,0.07);
-    transition: bottom 0.28s ease;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+  .historySheet{
+    position:absolute;
+    left:50%;
+    bottom:-82vh;
+    transform:translateX(-50%);
+    width:min(92vw,430px);
+    height:74vh;
+    background:#14151c;
+    border-radius:24px 24px 0 0;
+    border:1px solid rgba(255,255,255,.07);
+    transition:bottom .28s ease;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
   }
 
-  .historyOverlay.show .historySheet {
-    bottom: 0;
+  .historyOverlay.show .historySheet{
+    bottom:0;
   }
 
-  .historyHead {
-    padding: 14px 14px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+  .historyHead{
+    padding:14px 14px 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid rgba(255,255,255,.06);
   }
 
-  .historyTitle {
-    font-size: 16px;
-    font-weight: 900;
+  .historyTitle{
+    font-size:16px;
+    font-weight:900;
   }
 
-  .closeBtn {
-    appearance: none;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.05);
-    color: #fff;
-    border-radius: 999px;
-    padding: 8px 12px;
-    font-size: 12px;
-    font-weight: 800;
-    cursor: pointer;
+  .closeBtn{
+    appearance:none;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.05);
+    color:#fff;
+    border-radius:999px;
+    padding:8px 12px;
+    font-size:12px;
+    font-weight:800;
+    cursor:pointer;
   }
 
-  .historyBody {
-    padding: 10px 14px 20px;
-    overflow-y: auto;
-    flex: 1;
+  .historyBody{
+    padding:10px 14px 20px;
+    overflow-y:auto;
+    flex:1;
   }
 
-  .historyLine {
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    font-size: 14px;
-    line-height: 1.55;
+  .historyLine{
+    padding:10px 0;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    font-size:14px;
+    line-height:1.55;
   }
 
-  .historyEmpty {
-    opacity: 0.65;
-    font-size: 14px;
-    padding-top: 8px;
+  .historyEmpty{
+    opacity:.65;
+    font-size:14px;
+    padding-top:8px;
   }
 
-  .cutinOverlay {
-    background:
-      linear-gradient(180deg, rgba(8,8,12,0.92) 0%, rgba(8,8,12,0.82) 100%);
+  .girlOverlay{
+    background:#e6e6e6;
+    z-index:100;
   }
 
-  .cutinStage {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 18px 16px 28px;
-    gap: 18px;
+  .girlStage{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding:18px 14px 0;
   }
 
-  .cutinSpeech {
-    width: min(92vw, 560px);
-    background: #fff;
-    color: #111;
-    border-radius: 26px;
-    padding: 16px 18px 18px;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.28);
+  .girlSpeech{
+    width:min(92vw, 620px);
+    background:#fff;
+    color:#111;
+    border-radius:28px;
+    padding:18px 18px 20px;
+    position:relative;
+    box-shadow:0 10px 26px rgba(0,0,0,.12);
   }
 
-  .cutinName {
-    display: inline-block;
-    margin-bottom: 10px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: #111;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 900;
+  .girlSpeech::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:-18px;
+    width:0;
+    height:0;
+    border-left:16px solid transparent;
+    border-right:16px solid transparent;
+    border-top:18px solid #fff;
   }
 
-  .cutinText {
-    font-size: 18px;
-    font-weight: 900;
-    line-height: 1.5;
-    min-height: 54px;
+  .girlName{
+    display:inline-block;
+    margin-bottom:12px;
+    padding:7px 14px;
+    border-radius:999px;
+    background:#111;
+    color:#fff;
+    font-size:14px;
+    font-weight:900;
   }
 
-  .cutinDice {
-    margin-top: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    min-height: 54px;
+  .girlText{
+    font-size:18px;
+    font-weight:900;
+    line-height:1.55;
+    min-height:60px;
   }
 
-  .cutinDiceEmoji {
-    font-size: 34px;
+  .girlImageWrap{
+    flex:1;
+    width:100%;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    padding-top:28px;
   }
 
-  .cutinDiceNum {
-    font-size: 42px;
-    font-weight: 900;
-    min-width: 40px;
-    text-align: center;
+  .girlImage{
+    max-width:min(92vw, 430px);
+    max-height:68vh;
+    object-fit:contain;
   }
 
-  .cutinGirlWrap {
-    flex: 0 0 auto;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    width: 100%;
+  .diceOverlay{
+    background:rgba(8,8,12,.9);
+    z-index:110;
   }
 
-  .cutinGirl {
-    max-width: min(88vw, 420px);
-    max-height: 52vh;
-    object-fit: contain;
-    filter: drop-shadow(0 14px 24px rgba(0,0,0,0.4));
+  .diceStage{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    padding:24px;
   }
 
-  .footerSpace {
-    height: 10px;
+  .diceLabel{
+    font-size:18px;
+    font-weight:900;
+    opacity:.92;
+  }
+
+  .diceBig{
+    font-size:100px;
+    line-height:1;
+  }
+
+  .diceResult{
+    font-size:80px;
+    font-weight:900;
+    line-height:1;
+    min-height:92px;
+  }
+
+  .footerSpace{
+    height:10px;
   }
 </style>
 </head>
@@ -439,7 +468,7 @@
         <div class="diceEmoji">🎲</div>
         <div class="diceNum" id="diceNum">-</div>
       </div>
-      <div class="subInfo" id="subInfo">サイコロをふる</div>
+      <div class="subInfo" id="subInfo">自動進行中</div>
     </div>
 
     <div class="panel boardWrap">
@@ -451,7 +480,7 @@
     </div>
 
     <div class="controls">
-      <button class="mainBtn" id="rollBtn" type="button">サイコロをふる</button>
+      <button class="mainBtn" id="autoBtn" type="button" disabled>進行中…</button>
       <button class="mainBtn" id="resetBtn" type="button">リセット</button>
     </div>
 
@@ -463,19 +492,23 @@
     <div class="footerSpace"></div>
   </div>
 
-  <div class="cutinOverlay" id="cutinOverlay">
-    <div class="cutinStage">
-      <div class="cutinSpeech">
-        <div class="cutinName" id="cutinName">チー娘A</div>
-        <div class="cutinText" id="cutinText">いくよ。</div>
-        <div class="cutinDice">
-          <div class="cutinDiceEmoji">🎲</div>
-          <div class="cutinDiceNum" id="cutinDiceNum">-</div>
-        </div>
+  <div class="girlOverlay" id="girlOverlay">
+    <div class="girlStage">
+      <div class="girlSpeech">
+        <div class="girlName" id="girlName">チー娘A</div>
+        <div class="girlText" id="girlText">いくよ。</div>
       </div>
-      <div class="cutinGirlWrap">
-        <img src="girl1.png" alt="チー娘" class="cutinGirl" id="cutinGirl">
+      <div class="girlImageWrap">
+        <img src="girl1.png" alt="チー娘" class="girlImage" id="girlImage">
       </div>
+    </div>
+  </div>
+
+  <div class="diceOverlay" id="diceOverlay">
+    <div class="diceStage">
+      <div class="diceLabel" id="diceLabel">サイコロ…</div>
+      <div class="diceBig">🎲</div>
+      <div class="diceResult" id="diceResult">?</div>
     </div>
   </div>
 
@@ -493,111 +526,123 @@
   const GOAL = 20;
 
   const players = [
-    { id: "you", label: "あなた", short: "自", pos: 0, type: "human" },
-    { id: "a", label: "チー娘A", short: "A", pos: 0, type: "cpu", girlIndex: 0 },
-    { id: "b", label: "チー娘B", short: "B", pos: 0, type: "cpu", girlIndex: 1 },
-    { id: "c", label: "チー娘C", short: "C", pos: 0, type: "cpu", girlIndex: 2 }
+    { id:"you", label:"あなた", short:"自", pos:0, type:"human" },
+    { id:"a", label:"チー娘A", short:"A", pos:0, type:"cpu", girlIndex:0 },
+    { id:"b", label:"チー娘B", short:"B", pos:0, type:"cpu", girlIndex:1 },
+    { id:"c", label:"チー娘C", short:"C", pos:0, type:"cpu", girlIndex:2 }
   ];
 
   const girls = [
     {
-      name: "チー娘A",
-      image: "girl1.png",
-      yourTurn: ["あなたの番だよ。", "どれ出るかな。", "振ってみよっか。"],
-      cpuTurn: ["私の番だね。", "私が振るよ。", "いくよ。"],
-      rolling: ["ころころ…", "振るよ。", "せーの。"],
-      move: ["いい感じ。", "まあまあ進んだね。", "その調子。"],
-      plus: ["ちょっと得したね。", "ラッキーだよ。", "進んでいいよ。"],
-      minus: ["ちょっと戻ろっか。", "少しだけ下がるね。", "ここは戻るみたい。"],
-      again: ["もう1回どうぞ。", "続けて振っていいよ。", "もう一度いけるよ。"],
-      winYou: ["やった、あなたの勝ち。", "先にゴールだね。", "勝ち、おめでとう。"],
-      winCpu: ["やった、私が1番。", "先に着いたよ。", "勝っちゃった。"]
+      name:"チー娘A",
+      image:"girl1.png",
+      intro:["あなたの番だよ。","どれ出るかな。","いくよ。"],
+      move:["いい感じ。","まあまあ進んだね。","その調子。"],
+      plus:["ちょっと得したね。","ラッキーだよ。","進んでいいよ。"],
+      minus:["ちょっと戻ろっか。","少し下がるね。","ここは戻るみたい。"],
+      again:["もう1回どうぞ。","続けて振っていいよ。","もう一度いけるよ。"],
+      winYou:["やった、あなたの勝ち。","先にゴールだね。","勝ち、おめでとう。"],
+      winCpu:["やった、私が1番。","先に着いたよ。","勝っちゃった。"]
     },
     {
-      name: "チー娘B",
-      image: "girl2.png",
-      yourTurn: ["ほら、あなたの番。", "ちゃんと見ててよね。", "私が振るから。"],
-      cpuTurn: ["私の番ね。", "見てなさい。", "振るよ。"],
-      rolling: ["いくよ。", "ころっ。", "出るかな。"],
-      move: ["悪くない。", "まあ、こんなもんかな。", "まだこれからでしょ。"],
-      plus: ["ちょっと運いいじゃん。", "はい、進んでいいよ。", "ラッキーなんじゃない？"],
-      minus: ["少し戻るみたい。", "まあ、そういう時もある。", "戻ってね。"],
-      again: ["もう1回ね。", "続けてどうぞ。", "今回はもう1回でいいよ。"],
-      winYou: ["あなたの勝ちか。まあいいけど。", "先に着いたのね。", "はいはい、おめでとう。"],
-      winCpu: ["私の勝ち。まあ当然かな。", "ほらね、勝った。", "先にゴールしたけど？"]
+      name:"チー娘B",
+      image:"girl2.png",
+      intro:["ほら、始まるよ。","見てなさい。","出るかな。"],
+      move:["悪くない。","まあ、こんなもんかな。","まだこれからでしょ。"],
+      plus:["ちょっと運いいじゃん。","はい、進んでいいよ。","ラッキーなんじゃない？"],
+      minus:["少し戻るみたい。","まあ、そういう時もある。","戻ってね。"],
+      again:["もう1回ね。","続けてどうぞ。","今回はもう1回でいいよ。"],
+      winYou:["あなたの勝ちか。まあいいけど。","先に着いたのね。","はいはい、おめでとう。"],
+      winCpu:["私の勝ち。まあ当然かな。","ほらね、勝った。","先にゴールしたけど？"]
     },
     {
-      name: "チー娘C",
-      image: "girl3.png",
-      yourTurn: ["あなたの番。", "振る。", "……見てて。"],
-      cpuTurn: ["私が振る。", "いく。", "……出る。"],
-      rolling: ["ころ。", "……いく。", "出る。"],
-      move: ["進んだ。", "悪くない。", "まだ行ける。"],
-      plus: ["さらに進む。", "得した。", "前へ。"],
-      minus: ["少し下がる。", "戻る。", "……しかたない。"],
-      again: ["もう1回。", "続けて。", "再挑戦。"],
-      winYou: ["ゴール。あなたの勝ち。", "……先だったね。", "勝ち。おめでとう。"],
-      winCpu: ["ゴール。私の勝ち。", "……先だった。", "終わり。勝った。"]
+      name:"チー娘C",
+      image:"girl3.png",
+      intro:["……いく。","始まる。","出る。"],
+      move:["進んだ。","悪くない。","まだ行ける。"],
+      plus:["さらに進む。","得した。","前へ。"],
+      minus:["少し下がる。","戻る。","……しかたない。"],
+      again:["もう1回。","続けて。","再挑戦。"],
+      winYou:["ゴール。あなたの勝ち。","……先だったね。","勝ち。おめでとう。"],
+      winCpu:["ゴール。私の勝ち。","……先だった。","終わり。勝った。"]
     }
   ];
 
   const eventMap = {
-    3:  { type: "plus",  value: 2 },
-    6:  { type: "minus", value: 2 },
-    8:  { type: "again", value: 0 },
-    11: { type: "plus",  value: 1 },
-    14: { type: "minus", value: 3 },
-    17: { type: "again", value: 0 }
+    3:  { type:"plus",  value:2 },
+    6:  { type:"minus", value:2 },
+    8:  { type:"again", value:0 },
+    11: { type:"plus",  value:1 },
+    14: { type:"minus", value:3 },
+    17: { type:"again", value:0 }
   };
 
   let turnIndex = 0;
   let gameEnded = false;
-  let historyLogs = [];
   let busy = false;
+  let historyLogs = [];
 
   const boardEl = document.getElementById("board");
   const rankingBodyEl = document.getElementById("rankingBody");
   const turnLabelEl = document.getElementById("turnLabel");
   const diceNumEl = document.getElementById("diceNum");
   const subInfoEl = document.getElementById("subInfo");
-
-  const rollBtn = document.getElementById("rollBtn");
+  const autoBtn = document.getElementById("autoBtn");
   const resetBtn = document.getElementById("resetBtn");
   const historyBtn = document.getElementById("historyBtn");
 
-  const cutinOverlay = document.getElementById("cutinOverlay");
-  const cutinName = document.getElementById("cutinName");
-  const cutinText = document.getElementById("cutinText");
-  const cutinGirl = document.getElementById("cutinGirl");
-  const cutinDiceNum = document.getElementById("cutinDiceNum");
+  const girlOverlay = document.getElementById("girlOverlay");
+  const girlNameEl = document.getElementById("girlName");
+  const girlTextEl = document.getElementById("girlText");
+  const girlImageEl = document.getElementById("girlImage");
+
+  const diceOverlay = document.getElementById("diceOverlay");
+  const diceLabelEl = document.getElementById("diceLabel");
+  const diceResultEl = document.getElementById("diceResult");
 
   const historyOverlay = document.getElementById("historyOverlay");
   const historyBody = document.getElementById("historyBody");
   const closeHistoryBtn = document.getElementById("closeHistoryBtn");
 
-  function rand(arr) {
+  function rand(arr){
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  function wait(ms) {
+  function wait(ms){
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  function getGirlIndexForTurn(player) {
-    if (player.type === "human") {
+  function getGirlIndexForTurn(player){
+    if(player.type === "human"){
       return Math.floor(Math.random() * 3);
     }
     return player.girlIndex;
   }
 
-  function addHistory(text) {
+  function setBusy(flag){
+    busy = flag;
+    autoBtn.disabled = true;
+    historyBtn.disabled = flag;
+    resetBtn.disabled = false;
+  }
+
+  function updateTurnLabel(){
+    const current = players[turnIndex];
+    turnLabelEl.textContent = `現在の番：${current.label}`;
+  }
+
+  function setSubInfo(text){
+    subInfoEl.textContent = text;
+  }
+
+  function addHistory(text){
     historyLogs.unshift(text);
     renderHistory();
   }
 
-  function renderHistory() {
+  function renderHistory(){
     historyBody.innerHTML = "";
-    if (!historyLogs.length) {
+    if(!historyLogs.length){
       const empty = document.createElement("div");
       empty.className = "historyEmpty";
       empty.textContent = "まだ履歴はありません。";
@@ -613,37 +658,50 @@
     });
   }
 
-  function openHistory() {
-    if (busy) return;
+  function openHistory(){
+    if(busy) return;
     historyOverlay.classList.add("show");
   }
 
-  function closeHistory() {
+  function closeHistory(){
     historyOverlay.classList.remove("show");
   }
 
-  function showCutin(girlIndex, text, diceText = "-") {
-    cutinName.textContent = girls[girlIndex].name;
-    cutinText.textContent = text;
-    cutinGirl.src = girls[girlIndex].image;
-    cutinDiceNum.textContent = diceText;
-    cutinOverlay.classList.add("show");
+  function showGirl(girlIndex, text){
+    girlNameEl.textContent = girls[girlIndex].name;
+    girlTextEl.textContent = text;
+    girlImageEl.src = girls[girlIndex].image;
+    girlOverlay.classList.add("show");
   }
 
-  function hideCutin() {
-    cutinOverlay.classList.remove("show");
+  function hideGirl(){
+    girlOverlay.classList.remove("show");
   }
 
-  function drawBoard() {
+  function showDice(label, value = "?"){
+    diceLabelEl.textContent = label;
+    diceResultEl.textContent = value;
+    diceOverlay.classList.add("show");
+  }
+
+  function hideDice(){
+    diceOverlay.classList.remove("show");
+  }
+
+  function movePlayer(player, amount){
+    player.pos = Math.max(0, Math.min(GOAL, player.pos + amount));
+  }
+
+  function drawBoard(){
     boardEl.innerHTML = "";
 
-    for (let i = 0; i <= GOAL; i++) {
+    for(let i = 0; i <= GOAL; i++){
       const cell = document.createElement("div");
       let cls = "cell";
-      if (i === GOAL) cls += " goal";
-      if (eventMap[i]?.type === "plus") cls += " event-plus";
-      if (eventMap[i]?.type === "minus") cls += " event-minus";
-      if (eventMap[i]?.type === "again") cls += " event-again";
+      if(i === GOAL) cls += " goal";
+      if(eventMap[i]?.type === "plus") cls += " event-plus";
+      if(eventMap[i]?.type === "minus") cls += " event-minus";
+      if(eventMap[i]?.type === "again") cls += " event-again";
       cell.className = cls;
 
       const num = document.createElement("div");
@@ -651,12 +709,12 @@
       num.textContent = i === GOAL ? "GOAL" : i;
       cell.appendChild(num);
 
-      if (eventMap[i]) {
+      if(eventMap[i]){
         const mark = document.createElement("div");
         mark.className = "eventMark";
-        if (eventMap[i].type === "plus") mark.textContent = `+${eventMap[i].value}`;
-        if (eventMap[i].type === "minus") mark.textContent = `-${eventMap[i].value}`;
-        if (eventMap[i].type === "again") mark.textContent = `↺`;
+        if(eventMap[i].type === "plus") mark.textContent = `+${eventMap[i].value}`;
+        if(eventMap[i].type === "minus") mark.textContent = `-${eventMap[i].value}`;
+        if(eventMap[i].type === "again") mark.textContent = "↺";
         cell.appendChild(mark);
       }
 
@@ -664,7 +722,7 @@
       tokens.className = "tokens";
 
       players.forEach(player => {
-        if (player.pos === i) {
+        if(player.pos === i){
           const token = document.createElement("div");
           token.className = `token ${player.id}`;
           token.textContent = player.short;
@@ -677,7 +735,7 @@
     }
   }
 
-  function updateRanking() {
+  function updateRanking(){
     const sorted = [...players].sort((a, b) => b.pos - a.pos);
     rankingBodyEl.innerHTML = "";
 
@@ -689,187 +747,168 @@
     });
   }
 
-  function updateTurnLabel() {
-    const current = players[turnIndex];
-    turnLabelEl.textContent = `現在の番：${current.label}`;
+  async function showIntroAndRoll(player, girlIndex){
+    showGirl(girlIndex, rand(girls[girlIndex].intro));
+    await wait(1200);
+    hideGirl();
+    await wait(180);
+
+    showDice("サイコロ…", "?");
+    await wait(250);
+    diceResultEl.textContent = "1";
+    await wait(120);
+    diceResultEl.textContent = "4";
+    await wait(120);
+    diceResultEl.textContent = "2";
+    await wait(120);
+    diceResultEl.textContent = "6";
+    await wait(150);
   }
 
-  function setSubInfo(text) {
-    subInfoEl.textContent = text;
+  async function showResultReaction(girlIndex, text){
+    showGirl(girlIndex, text);
+    await wait(1150);
+    hideGirl();
+    await wait(150);
   }
 
-  function movePlayer(player, amount) {
-    player.pos = Math.max(0, Math.min(GOAL, player.pos + amount));
-  }
-
-  function setBusy(flag) {
-    busy = flag;
-    rollBtn.disabled = flag || gameEnded;
-    resetBtn.disabled = flag;
-    historyBtn.disabled = flag;
-  }
-
-  async function showTurnIntro() {
-    if (gameEnded) return;
-
-    const current = players[turnIndex];
-    const girlIndex = getGirlIndexForTurn(current);
-
-    updateTurnLabel();
-    setSubInfo("サイコロをふる");
-
-    if (current.type === "human") {
-      showCutin(girlIndex, rand(girls[girlIndex].yourTurn));
-    } else {
-      showCutin(girlIndex, rand(girls[girlIndex].cpuTurn));
-    }
-
-    await wait(950);
-    hideCutin();
-    return girlIndex;
-  }
-
-  async function handleWin(player, speakerGirl) {
-    gameEnded = true;
-    setBusy(false);
-    rollBtn.disabled = true;
-    resetBtn.disabled = false;
-    historyBtn.disabled = false;
-    updateRanking();
-
-    if (player.type === "human") {
-      showCutin(speakerGirl, rand(girls[speakerGirl].winYou), "★");
-      addHistory("あなたがゴールして勝利。");
-      setSubInfo("あなたの勝ち");
-    } else {
-      showCutin(speakerGirl, rand(girls[speakerGirl].winCpu), "★");
-      addHistory(`${player.label} がゴール。`);
-      setSubInfo(`${player.label} の勝ち`);
-    }
-  }
-
-  async function processEvent(player, speakerGirl) {
+  async function handleEvent(player, girlIndex){
     const event = eventMap[player.pos];
-    if (!event || player.pos >= GOAL) return false;
+    if(!event || player.pos >= GOAL) return false;
 
-    if (event.type === "plus") {
+    if(event.type === "plus"){
       const before = player.pos;
       movePlayer(player, event.value);
       drawBoard();
       updateRanking();
-      showCutin(speakerGirl, rand(girls[speakerGirl].plus), `+${event.value}`);
-      addHistory(`${player.label} はイベントで ${event.value} マス進んだ（${before} → ${player.pos}）`);
       setSubInfo(`イベント：+${event.value}マス`);
-      await wait(1050);
+      addHistory(`${player.label} はイベントで ${event.value} マス進んだ（${before} → ${player.pos}）`);
+      await showResultReaction(girlIndex, rand(girls[girlIndex].plus));
 
-      if (player.pos >= GOAL) {
-        await handleWin(player, speakerGirl);
-      } else {
-        hideCutin();
+      if(player.pos >= GOAL){
+        await handleWin(player, girlIndex);
       }
       return false;
     }
 
-    if (event.type === "minus") {
+    if(event.type === "minus"){
       const before = player.pos;
       movePlayer(player, -event.value);
       drawBoard();
       updateRanking();
-      showCutin(speakerGirl, rand(girls[speakerGirl].minus), `-${event.value}`);
-      addHistory(`${player.label} はイベントで ${event.value} マス戻った（${before} → ${player.pos}）`);
       setSubInfo(`イベント：-${event.value}マス`);
-      await wait(1050);
-      hideCutin();
+      addHistory(`${player.label} はイベントで ${event.value} マス戻った（${before} → ${player.pos}）`);
+      await showResultReaction(girlIndex, rand(girls[girlIndex].minus));
       return false;
     }
 
-    if (event.type === "again") {
-      showCutin(speakerGirl, rand(girls[speakerGirl].again), "↺");
-      addHistory(`${player.label} はイベントでもう1回。`);
+    if(event.type === "again"){
       setSubInfo("イベント：もう1回");
-      await wait(1050);
-      hideCutin();
+      addHistory(`${player.label} はイベントでもう1回。`);
+      await showResultReaction(girlIndex, rand(girls[girlIndex].again));
       return true;
     }
 
     return false;
   }
 
-  async function rollDice() {
-    if (gameEnded || busy) return;
+  async function handleWin(player, girlIndex){
+    gameEnded = true;
+    setBusy(false);
+    updateRanking();
+
+    if(player.type === "human"){
+      addHistory("あなたがゴールして勝利。");
+      setSubInfo("あなたの勝ち");
+      showGirl(girlIndex, rand(girls[girlIndex].winYou));
+    } else {
+      addHistory(`${player.label} がゴール。`);
+      setSubInfo(`${player.label} の勝ち`);
+      showGirl(girlIndex, rand(girls[girlIndex].winCpu));
+    }
+
+    showDice("ゴール", "★");
+    autoBtn.textContent = "終了";
+  }
+
+  async function playTurn(){
+    if(gameEnded || busy) return;
 
     setBusy(true);
 
     const player = players[turnIndex];
-    const speakerGirl = getGirlIndexForTurn(player);
-    const dice = Math.floor(Math.random() * 6) + 1;
+    const girlIndex = getGirlIndexForTurn(player);
     const before = player.pos;
 
-    showCutin(speakerGirl, rand(girls[speakerGirl].rolling), "…");
-    setSubInfo("振っている…");
+    updateTurnLabel();
+    setSubInfo("進行中…");
 
-    await wait(520);
-    cutinDiceNum.textContent = "🎲";
-    await wait(260);
-    cutinDiceNum.textContent = dice;
+    await showIntroAndRoll(player, girlIndex);
+
+    const dice = Math.floor(Math.random() * 6) + 1;
+    diceResultEl.textContent = dice;
     diceNumEl.textContent = dice;
-    cutinText.textContent = rand(girls[speakerGirl].move);
+    setSubInfo(`${dice}マス進んだ`);
+    await wait(700);
+    hideDice();
 
     movePlayer(player, dice);
     drawBoard();
     updateRanking();
-
     addHistory(`${player.label} が ${dice} マス進んだ（${before} → ${player.pos}）`);
-    setSubInfo(`${dice}マス進んだ`);
 
-    await wait(900);
+    await showResultReaction(girlIndex, rand(girls[girlIndex].move));
 
-    if (player.pos >= GOAL) {
-      await handleWin(player, speakerGirl);
+    if(player.pos >= GOAL){
+      await handleWin(player, girlIndex);
       return;
     }
 
-    const again = await processEvent(player, speakerGirl);
-    if (gameEnded) return;
+    const again = await handleEvent(player, girlIndex);
+    if(gameEnded) return;
 
-    if (again) {
+    if(again){
       setBusy(false);
-      updateTurnLabel();
+      await wait(250);
+      playTurn();
       return;
     }
 
-    hideCutin();
     turnIndex = (turnIndex + 1) % players.length;
-    await wait(180);
+    updateTurnLabel();
+    setSubInfo("次の番へ");
     setBusy(false);
-    await showTurnIntro();
+
+    await wait(350);
+    playTurn();
   }
 
-  async function resetGame() {
+  async function resetGame(){
+    hideGirl();
+    hideDice();
     players.forEach(p => p.pos = 0);
     turnIndex = 0;
     gameEnded = false;
+    busy = false;
     historyLogs = [];
     diceNumEl.textContent = "-";
+    autoBtn.textContent = "進行中…";
     drawBoard();
     updateRanking();
     renderHistory();
-    hideCutin();
-    setBusy(false);
     updateTurnLabel();
-    setSubInfo("サイコロをふる");
+    setSubInfo("自動進行中");
     addHistory("ゲーム開始。");
-    await showTurnIntro();
+    await wait(500);
+    playTurn();
   }
 
-  rollBtn.addEventListener("click", rollDice);
-  resetBtn.addEventListener("click", resetGame);
   historyBtn.addEventListener("click", openHistory);
   closeHistoryBtn.addEventListener("click", closeHistory);
-
   historyOverlay.addEventListener("click", (e) => {
-    if (e.target === historyOverlay) closeHistory();
+    if(e.target === historyOverlay) closeHistory();
   });
+  resetBtn.addEventListener("click", resetGame);
 
   resetGame();
 </script>
