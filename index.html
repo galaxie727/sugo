@@ -219,14 +219,8 @@
     cursor:pointer;
   }
 
-  #rollBtn{
-    flex:1;
-    background:#ffffff;
-    color:#111;
-  }
-
   #resetBtn{
-    width:100px;
+    width:100%;
     background:#272935;
     color:#fff;
     border:1px solid rgba(255,255,255,.08);
@@ -345,7 +339,6 @@
     padding-top:8px;
   }
 
-  /* 女の子全面 */
   .girlOverlay{
     background:#dcdcdc;
     z-index:100;
@@ -358,20 +351,20 @@
     flex-direction:column;
     align-items:center;
     justify-content:flex-start;
-    padding:16px 10px 0;
+    padding:12px 10px 0;
   }
 
   .girlSpeech{
     width:min(95vw, 700px);
-    background:rgba(255,255,255,.22);
+    background:rgba(255,255,255,.12);
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter:blur(10px);
     color:#111;
     border-radius:30px;
-    padding:18px 20px 22px;
+    padding:18px 20px 20px;
     position:relative;
-    box-shadow:0 8px 24px rgba(0,0,0,.05);
-    border:1px solid rgba(255,255,255,.25);
+    box-shadow:0 8px 24px rgba(0,0,0,.04);
+    border:1px solid rgba(255,255,255,.18);
   }
 
   .girlSpeech::after{
@@ -379,12 +372,12 @@
     position:absolute;
     left:50%;
     transform:translateX(-50%);
-    bottom:-18px;
+    bottom:-16px;
     width:0;
     height:0;
-    border-left:18px solid transparent;
-    border-right:18px solid transparent;
-    border-top:18px solid rgba(255,255,255,.22);
+    border-left:16px solid transparent;
+    border-right:16px solid transparent;
+    border-top:16px solid rgba(255,255,255,.12);
   }
 
   .girlName{
@@ -402,7 +395,7 @@
     font-size:18px;
     font-weight:900;
     line-height:1.6;
-    min-height:58px;
+    min-height:48px;
   }
 
   .girlAction{
@@ -423,10 +416,10 @@
     font-size:16px;
     font-weight:900;
     color:#111;
-    background:rgba(255,255,255,.78);
+    background:rgba(255,255,255,.72);
     backdrop-filter:blur(8px);
     -webkit-backdrop-filter:blur(8px);
-    box-shadow:0 6px 16px rgba(0,0,0,.08);
+    box-shadow:0 6px 16px rgba(0,0,0,.06);
     cursor:pointer;
   }
 
@@ -436,19 +429,18 @@
     display:flex;
     align-items:flex-end;
     justify-content:center;
-    padding-top:18px;
+    padding-top:10px;
     overflow:hidden;
   }
 
   .girlImage{
     width:100vw;
     max-width:none;
-    height:calc(100vh - 180px);
+    height:calc(100vh - 150px);
     object-fit:cover;
-    object-position:center top;
+    object-position:center 18%;
   }
 
-  /* サイコロ画面 */
   .diceOverlay{
     background:rgba(8,8,12,.92);
     z-index:110;
@@ -513,7 +505,6 @@
     </div>
 
     <div class="controls">
-      <button class="mainBtn" id="rollBtn" type="button" disabled>サイコロをふる</button>
       <button class="mainBtn" id="resetBtn" type="button">リセット</button>
     </div>
 
@@ -628,7 +619,6 @@
   const turnLabelEl = document.getElementById("turnLabel");
   const diceNumEl = document.getElementById("diceNum");
   const subInfoEl = document.getElementById("subInfo");
-  const rollBtn = document.getElementById("rollBtn");
   const resetBtn = document.getElementById("resetBtn");
   const historyBtn = document.getElementById("historyBtn");
 
@@ -663,7 +653,6 @@
   }
 
   function updateButtons(){
-    rollBtn.disabled = true;
     overlayRollBtn.disabled = !(waitingForUserRoll && !busy && !gameEnded);
     historyBtn.disabled = busy;
   }
@@ -892,8 +881,6 @@
     }
 
     showDice("ゴール", "★");
-    rollBtn.textContent = "終了";
-    rollBtn.disabled = true;
   }
 
   async function executeRoll(){
@@ -970,7 +957,6 @@
     currentSpeakerGirl = 0;
 
     diceNumEl.textContent = "-";
-    rollBtn.textContent = "サイコロをふる";
 
     drawBoard();
     updateRanking();
@@ -985,11 +971,6 @@
   }
 
   overlayRollBtn.addEventListener("click", async () => {
-    if(!waitingForUserRoll || busy || gameEnded) return;
-    await executeRoll();
-  });
-
-  rollBtn.addEventListener("click", async () => {
     if(!waitingForUserRoll || busy || gameEnded) return;
     await executeRoll();
   });
