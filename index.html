@@ -219,7 +219,7 @@
     cursor:pointer;
   }
 
-  #autoBtn{
+  #rollBtn{
     flex:1;
     background:#ffffff;
     color:#111;
@@ -345,9 +345,9 @@
     padding-top:8px;
   }
 
-  /* 女の子カットイン */
+  /* 女の子全面 */
   .girlOverlay{
-    background:#e7e7e7;
+    background:#dcdcdc;
     z-index:100;
   }
 
@@ -358,17 +358,20 @@
     flex-direction:column;
     align-items:center;
     justify-content:flex-start;
-    padding:18px 14px 0;
+    padding:16px 10px 0;
   }
 
   .girlSpeech{
-    width:min(92vw, 660px);
-    background:#fff;
+    width:min(95vw, 700px);
+    background:rgba(255,255,255,.58);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
     color:#111;
     border-radius:30px;
     padding:18px 20px 22px;
     position:relative;
-    box-shadow:0 10px 26px rgba(0,0,0,.12);
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+    border:1px solid rgba(255,255,255,.45);
   }
 
   .girlSpeech::after{
@@ -381,7 +384,8 @@
     height:0;
     border-left:18px solid transparent;
     border-right:18px solid transparent;
-    border-top:18px solid #fff;
+    border-top:18px solid rgba(255,255,255,.58);
+    filter:drop-shadow(0 2px 0 rgba(255,255,255,.18));
   }
 
   .girlName{
@@ -408,14 +412,16 @@
     display:flex;
     align-items:flex-end;
     justify-content:center;
-    padding-top:26px;
+    padding-top:18px;
+    overflow:hidden;
   }
 
   .girlImage{
-    width:min(92vw, 430px);
-    height:72vh;
-    object-fit:contain;
-    object-position:center bottom;
+    width:100vw;
+    max-width:none;
+    height:calc(100vh - 180px);
+    object-fit:cover;
+    object-position:center top;
   }
 
   /* サイコロ画面 */
@@ -471,7 +477,7 @@
         <div class="diceEmoji">🎲</div>
         <div class="diceNum" id="diceNum">-</div>
       </div>
-      <div class="subInfo" id="subInfo">自動進行中</div>
+      <div class="subInfo" id="subInfo">あなたの番を待っています</div>
     </div>
 
     <div class="panel boardWrap">
@@ -483,7 +489,7 @@
     </div>
 
     <div class="controls">
-      <button class="mainBtn" id="autoBtn" type="button" disabled>進行中…</button>
+      <button class="mainBtn" id="rollBtn" type="button" disabled>サイコロをふる</button>
       <button class="mainBtn" id="resetBtn" type="button">リセット</button>
     </div>
 
@@ -539,7 +545,8 @@
     {
       name:"チー娘A",
       image:"girl1.png",
-      intro:["あなたの番だよ。","どれ出るかな。","いくよ。"],
+      introHuman:["あなたの番だよ。","押したら振るよ。","準備できたらどうぞ。"],
+      introCpu:["いくよ。","始まるよ。","見てて。"],
       move:["いい感じ。","まあまあ進んだね。","その調子。"],
       plus:["ちょっと得したね。","ラッキーだよ。","進んでいいよ。"],
       minus:["ちょっと戻ろっか。","少し下がるね。","ここは戻るみたい。"],
@@ -550,7 +557,8 @@
     {
       name:"チー娘B",
       image:"girl2.png",
-      intro:["ほら、始まるよ。","見てなさい。","出るかな。"],
+      introHuman:["ほら、あなたの番。","押したら始まるよ。","準備できた？"],
+      introCpu:["ほら、始まるよ。","見てなさい。","出るかな。"],
       move:["悪くない。","まあ、こんなもんかな。","まだこれからでしょ。"],
       plus:["ちょっと運いいじゃん。","はい、進んでいいよ。","ラッキーなんじゃない？"],
       minus:["少し戻るみたい。","まあ、そういう時もある。","戻ってね。"],
@@ -561,7 +569,8 @@
     {
       name:"チー娘C",
       image:"girl3.png",
-      intro:["……いく。","始まる。","出る。"],
+      introHuman:["あなたの番。","押して。","……準備できたら。"],
+      introCpu:["……いく。","始まる。","出る。"],
       move:["進んだ。","悪くない。","まだ行ける。"],
       plus:["さらに進む。","得した。","前へ。"],
       minus:["少し下がる。","戻る。","……しかたない。"],
@@ -584,13 +593,15 @@
   let gameEnded = false;
   let busy = false;
   let historyLogs = [];
+  let waitingForUserRoll = false;
+  let currentSpeakerGirl = 0;
 
   const boardEl = document.getElementById("board");
   const rankingBodyEl = document.getElementById("rankingBody");
   const turnLabelEl = document.getElementById("turnLabel");
   const diceNumEl = document.getElementById("diceNum");
   const subInfoEl = document.getElementById("subInfo");
-  const autoBtn = document.getElementById("autoBtn");
+  const rollBtn = document.getElementById("rollBtn");
   const resetBtn = document.getElementById("resetBtn");
   const historyBtn = document.getElementById("historyBtn");
 
@@ -622,11 +633,14 @@
     return player.girlIndex;
   }
 
+  function updateButtons(){
+    rollBtn.disabled = !(waitingForUserRoll && !busy && !gameEnded);
+    historyBtn.disabled = busy;
+  }
+
   function setBusy(flag){
     busy = flag;
-    autoBtn.disabled = true;
-    historyBtn.disabled = flag;
-    resetBtn.disabled = false;
+    updateButtons();
   }
 
   function updateTurnLabel(){
@@ -750,22 +764,27 @@
     });
   }
 
-  async function showIntroAndRoll(player, girlIndex){
-    showGirl(girlIndex, rand(girls[girlIndex].intro));
-    await wait(1700);
-    hideGirl();
-    await wait(350);
+  async function introForCurrentTurn(){
+    const player = players[turnIndex];
+    const girlIndex = getGirlIndexForTurn(player);
+    currentSpeakerGirl = girlIndex;
+    updateTurnLabel();
 
-    showDice("サイコロ…", "?");
-    await wait(350);
-    diceResultEl.textContent = "1";
-    await wait(220);
-    diceResultEl.textContent = "4";
-    await wait(220);
-    diceResultEl.textContent = "2";
-    await wait(220);
-    diceResultEl.textContent = "6";
-    await wait(260);
+    if(player.type === "human"){
+      waitingForUserRoll = true;
+      updateButtons();
+      setSubInfo("あなたの番です");
+      showGirl(girlIndex, rand(girls[girlIndex].introHuman));
+    } else {
+      waitingForUserRoll = false;
+      updateButtons();
+      setSubInfo("チー娘の番です");
+      showGirl(girlIndex, rand(girls[girlIndex].introCpu));
+      await wait(1700);
+      hideGirl();
+      await wait(350);
+      await executeRoll();
+    }
   }
 
   async function showResultReaction(girlIndex, text){
@@ -809,6 +828,15 @@
       setSubInfo("イベント：もう1回");
       addHistory(`${player.label} はイベントでもう1回。`);
       await showResultReaction(girlIndex, rand(girls[girlIndex].again));
+
+      if(player.type === "human"){
+        waitingForUserRoll = true;
+        updateButtons();
+        showGirl(girlIndex, rand(girls[girlIndex].introHuman));
+      } else {
+        await wait(450);
+        await introForCurrentTurn();
+      }
       return true;
     }
 
@@ -817,7 +845,8 @@
 
   async function handleWin(player, girlIndex){
     gameEnded = true;
-    setBusy(false);
+    waitingForUserRoll = false;
+    updateButtons();
     updateRanking();
 
     if(player.type === "human"){
@@ -831,22 +860,32 @@
     }
 
     showDice("ゴール", "★");
-    autoBtn.textContent = "終了";
+    rollBtn.textContent = "終了";
+    rollBtn.disabled = true;
   }
 
-  async function playTurn(){
+  async function executeRoll(){
     if(gameEnded || busy) return;
 
     setBusy(true);
 
     const player = players[turnIndex];
-    const girlIndex = getGirlIndexForTurn(player);
+    const girlIndex = currentSpeakerGirl || getGirlIndexForTurn(player);
     const before = player.pos;
 
-    updateTurnLabel();
-    setSubInfo("進行中…");
+    waitingForUserRoll = false;
+    updateButtons();
 
-    await showIntroAndRoll(player, girlIndex);
+    showDice("サイコロ…", "?");
+    await wait(350);
+    diceResultEl.textContent = "1";
+    await wait(220);
+    diceResultEl.textContent = "4";
+    await wait(220);
+    diceResultEl.textContent = "2";
+    await wait(220);
+    diceResultEl.textContent = "6";
+    await wait(260);
 
     const dice = Math.floor(Math.random() * 6) + 1;
     diceResultEl.textContent = dice;
@@ -865,26 +904,24 @@
 
     if(player.pos >= GOAL){
       await handleWin(player, girlIndex);
+      setBusy(false);
       return;
     }
 
     const again = await handleEvent(player, girlIndex);
-    if(gameEnded) return;
-
+    if(gameEnded){
+      setBusy(false);
+      return;
+    }
     if(again){
       setBusy(false);
-      await wait(500);
-      playTurn();
       return;
     }
 
     turnIndex = (turnIndex + 1) % players.length;
-    updateTurnLabel();
-    setSubInfo("次の番へ");
     setBusy(false);
-
     await wait(700);
-    playTurn();
+    await introForCurrentTurn();
   }
 
   async function resetGame(){
@@ -895,17 +932,30 @@
     gameEnded = false;
     busy = false;
     historyLogs = [];
+    waitingForUserRoll = false;
+    currentSpeakerGirl = 0;
+
     diceNumEl.textContent = "-";
-    autoBtn.textContent = "進行中…";
+    rollBtn.textContent = "サイコロをふる";
+
     drawBoard();
     updateRanking();
     renderHistory();
     updateTurnLabel();
-    setSubInfo("自動進行中");
+    setSubInfo("ゲーム開始");
     addHistory("ゲーム開始。");
-    await wait(900);
-    playTurn();
+    updateButtons();
+
+    await wait(700);
+    await introForCurrentTurn();
   }
+
+  rollBtn.addEventListener("click", async () => {
+    if(!waitingForUserRoll || busy || gameEnded) return;
+    hideGirl();
+    await wait(250);
+    await executeRoll();
+  });
 
   historyBtn.addEventListener("click", openHistory);
   closeHistoryBtn.addEventListener("click", closeHistory);
