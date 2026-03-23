@@ -202,7 +202,6 @@
     font-size:12px;
     font-weight:900;
     color:#111;
-    transition:transform .12s ease;
   }
 
   .you{ background:#fff; }
@@ -257,7 +256,8 @@
 
   .historyOverlay,
   .girlOverlay,
-  .diceOverlay{
+  .diceOverlay,
+  .resultOverlay{
     position:fixed;
     inset:0;
     z-index:90;
@@ -268,7 +268,8 @@
 
   .historyOverlay.show,
   .girlOverlay.show,
-  .diceOverlay.show{
+  .diceOverlay.show,
+  .resultOverlay.show{
     opacity:1;
     pointer-events:auto;
   }
@@ -471,6 +472,91 @@
     min-height:92px;
   }
 
+  .resultOverlay{
+    z-index:120;
+    background:rgba(5,7,12,.92);
+  }
+
+  .resultBox{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:min(92vw,430px);
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-radius:28px;
+    padding:22px 18px 18px;
+    box-shadow:0 14px 36px rgba(0,0,0,.22);
+  }
+
+  .resultTitle{
+    font-size:28px;
+    font-weight:900;
+    text-align:center;
+    margin-bottom:10px;
+  }
+
+  .resultSub{
+    text-align:center;
+    font-size:15px;
+    opacity:.92;
+    margin-bottom:16px;
+    line-height:1.6;
+  }
+
+  .resultList{
+    background:rgba(255,255,255,.05);
+    border-radius:18px;
+    padding:10px;
+    margin-bottom:14px;
+  }
+
+  .resultLine{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 10px;
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    margin-bottom:6px;
+    font-size:14px;
+    font-weight:800;
+  }
+
+  .resultLine:last-child{
+    margin-bottom:0;
+  }
+
+  .resultButtons{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .resultBtn{
+    appearance:none;
+    border:none;
+    border-radius:18px;
+    padding:16px 14px;
+    font-size:16px;
+    font-weight:900;
+    cursor:pointer;
+  }
+
+  .resultRetry{
+    background:#fff;
+    color:#111;
+  }
+
+  .resultTop{
+    background:#2b3044;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.08);
+  }
+
   .footerSpace{
     height:10px;
   }
@@ -535,6 +621,18 @@
       <div class="diceLabel" id="diceLabel">サイコロ…</div>
       <div class="diceBig">🎲</div>
       <div class="diceResult" id="diceResult">?</div>
+    </div>
+  </div>
+
+  <div class="resultOverlay" id="resultOverlay">
+    <div class="resultBox">
+      <div class="resultTitle" id="resultTitle">あなたの勝ち！</div>
+      <div class="resultSub" id="resultSub">先にゴールしました。</div>
+      <div class="resultList" id="resultList"></div>
+      <div class="resultButtons">
+        <button class="resultBtn resultRetry" id="retryBtn" type="button">もう一回</button>
+        <button class="resultBtn resultTop" id="topBtn" type="button">トップに戻る</button>
+      </div>
     </div>
   </div>
 
@@ -634,6 +732,13 @@
   const diceLabelEl = document.getElementById("diceLabel");
   const diceResultEl = document.getElementById("diceResult");
 
+  const resultOverlay = document.getElementById("resultOverlay");
+  const resultTitle = document.getElementById("resultTitle");
+  const resultSub = document.getElementById("resultSub");
+  const resultList = document.getElementById("resultList");
+  const retryBtn = document.getElementById("retryBtn");
+  const topBtn = document.getElementById("topBtn");
+
   const historyOverlay = document.getElementById("historyOverlay");
   const historyBody = document.getElementById("historyBody");
   const closeHistoryBtn = document.getElementById("closeHistoryBtn");
@@ -655,7 +760,7 @@
 
   function updateButtons(){
     overlayRollBtn.disabled = !(waitingForUserRoll && !busy && !gameEnded);
-    historyBtn.disabled = busy;
+    historyBtn.disabled = busy || resultOverlay.classList.contains("show");
   }
 
   function setBusy(flag){
@@ -696,7 +801,7 @@
   }
 
   function openHistory(){
-    if(busy) return;
+    if(busy || resultOverlay.classList.contains("show")) return;
     historyOverlay.classList.add("show");
   }
 
@@ -725,6 +830,38 @@
 
   function hideDice(){
     diceOverlay.classList.remove("show");
+  }
+
+  function getFinalRanking(){
+    return [...players].sort((a, b) => b.pos - a.pos);
+  }
+
+  function showResultScreen(winner){
+    const sorted = getFinalRanking();
+    resultList.innerHTML = "";
+
+    sorted.forEach((p, i) => {
+      const row = document.createElement("div");
+      row.className = "resultLine";
+      row.innerHTML = `<span>${i + 1}位　${p.label}</span><span>${p.pos} / ${GOAL}</span>`;
+      resultList.appendChild(row);
+    });
+
+    if(winner.id === "you"){
+      resultTitle.textContent = "あなたの勝ち！";
+      resultSub.textContent = "先にゴールしました。";
+    } else {
+      resultTitle.textContent = `${winner.label}の勝ち！`;
+      resultSub.textContent = "先にゴールしました。";
+    }
+
+    resultOverlay.classList.add("show");
+    updateButtons();
+  }
+
+  function hideResultScreen(){
+    resultOverlay.classList.remove("show");
+    updateButtons();
   }
 
   function movePlayer(player, amount){
@@ -783,7 +920,7 @@
   }
 
   function updateRanking(){
-    const sorted = [...players].sort((a, b) => b.pos - a.pos);
+    const sorted = getFinalRanking();
     rankingBodyEl.innerHTML = "";
 
     sorted.forEach((p, index) => {
@@ -911,6 +1048,10 @@
     }
 
     showDice("ゴール", "★");
+    await wait(1800);
+    hideDice();
+    await wait(150);
+    showResultScreen(player);
   }
 
   async function executeRoll(){
@@ -977,6 +1118,7 @@
   async function resetGame(){
     hideGirl();
     hideDice();
+    hideResultScreen();
     clearActiveStep();
     players.forEach(p => p.pos = 0);
     turnIndex = 0;
@@ -1010,7 +1152,10 @@
   historyOverlay.addEventListener("click", (e) => {
     if(e.target === historyOverlay) closeHistory();
   });
+
   resetBtn.addEventListener("click", resetGame);
+  retryBtn.addEventListener("click", resetGame);
+  topBtn.addEventListener("click", resetGame);
 
   resetGame();
 </script>
