@@ -257,7 +257,8 @@
   .historyOverlay,
   .girlOverlay,
   .diceOverlay,
-  .resultOverlay{
+  .resultOverlay,
+  .orderOverlay{
     position:fixed;
     inset:0;
     z-index:90;
@@ -269,7 +270,8 @@
   .historyOverlay.show,
   .girlOverlay.show,
   .diceOverlay.show,
-  .resultOverlay.show{
+  .resultOverlay.show,
+  .orderOverlay.show{
     opacity:1;
     pointer-events:auto;
   }
@@ -557,6 +559,58 @@
     border:1px solid rgba(255,255,255,.08);
   }
 
+  .orderOverlay{
+    z-index:130;
+    background:rgba(5,7,12,.94);
+  }
+
+  .orderBox{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:min(92vw,430px);
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-radius:28px;
+    padding:22px 18px 18px;
+    box-shadow:0 14px 36px rgba(0,0,0,.22);
+  }
+
+  .orderTitle{
+    font-size:24px;
+    font-weight:900;
+    text-align:center;
+    margin-bottom:12px;
+  }
+
+  .orderSub{
+    text-align:center;
+    font-size:14px;
+    opacity:.9;
+    margin-bottom:14px;
+    min-height:20px;
+  }
+
+  .orderList{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .orderLine{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 14px;
+    background:rgba(255,255,255,.05);
+    border-radius:14px;
+    font-size:15px;
+    font-weight:900;
+  }
+
   .footerSpace{
     height:10px;
   }
@@ -636,6 +690,14 @@
     </div>
   </div>
 
+  <div class="orderOverlay" id="orderOverlay">
+    <div class="orderBox">
+      <div class="orderTitle">順番を決めるよ</div>
+      <div class="orderSub" id="orderSub">シャッフル中…</div>
+      <div class="orderList" id="orderList"></div>
+    </div>
+  </div>
+
   <div class="historyOverlay" id="historyOverlay">
     <div class="historySheet">
       <div class="historyHead">
@@ -651,10 +713,10 @@
   const STEP_DELAY = 260;
 
   const players = [
-    { id:"you", label:"あなた", short:"自", pos:0, type:"human" },
-    { id:"a", label:"チー娘A", short:"A", pos:0, type:"cpu", girlIndex:0 },
-    { id:"b", label:"チー娘B", short:"B", pos:0, type:"cpu", girlIndex:1 },
-    { id:"c", label:"チー娘C", short:"C", pos:0, type:"cpu", girlIndex:2 }
+    { id:"you", label:"あなた", short:"自", pos:0, type:"human", turnOrder:0 },
+    { id:"a", label:"チー娘A", short:"A", pos:0, type:"cpu", girlIndex:0, turnOrder:0 },
+    { id:"b", label:"チー娘B", short:"B", pos:0, type:"cpu", girlIndex:1, turnOrder:0 },
+    { id:"c", label:"チー娘C", short:"C", pos:0, type:"cpu", girlIndex:2, turnOrder:0 }
   ];
 
   const girls = [
@@ -668,6 +730,7 @@
       minus:["ちょっと戻ろっか。","少し下がるね。","ここは戻るみたい。"],
       again:["もう1回どうぞ。","続けて振っていいよ。","もう一度いけるよ。"],
       winYou:["やった、あなたの勝ち。","先にゴールだね。","勝ち、おめでとう。"],
+      loseToCpu:["惜しかったね。","あと少しだった。","次はいけるよ。"],
       winCpu:["やった、私が1番。","先に着いたよ。","勝っちゃった。"]
     },
     {
@@ -680,6 +743,7 @@
       minus:["少し戻るみたい。","まあ、そういう時もある。","戻ってね。"],
       again:["もう1回ね。","続けてどうぞ。","今回はもう1回でいいよ。"],
       winYou:["あなたの勝ちか。まあいいけど。","先に着いたのね。","はいはい、おめでとう。"],
+      loseToCpu:["惜しかったんじゃない？","あと少しだったね。","まあ、次かな。"],
       winCpu:["私の勝ち。まあ当然かな。","ほらね、勝った。","先にゴールしたけど？"]
     },
     {
@@ -692,6 +756,7 @@
       minus:["少し下がる。","戻る。","……しかたない。"],
       again:["もう1回。","続けて。","再挑戦。"],
       winYou:["ゴール。あなたの勝ち。","……先だったね。","勝ち。おめでとう。"],
+      loseToCpu:["あと少し。","……惜しかった。","次。"],
       winCpu:["ゴール。私の勝ち。","……先だった。","終わり。勝った。"]
     }
   ];
@@ -739,6 +804,10 @@
   const retryBtn = document.getElementById("retryBtn");
   const topBtn = document.getElementById("topBtn");
 
+  const orderOverlay = document.getElementById("orderOverlay");
+  const orderSub = document.getElementById("orderSub");
+  const orderList = document.getElementById("orderList");
+
   const historyOverlay = document.getElementById("historyOverlay");
   const historyBody = document.getElementById("historyBody");
   const closeHistoryBtn = document.getElementById("closeHistoryBtn");
@@ -751,6 +820,15 @@
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  function shuffle(array){
+    const arr = [...array];
+    for(let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
   function getGirlIndexForTurn(player){
     if(player.type === "human"){
       return Math.floor(Math.random() * 3);
@@ -760,7 +838,7 @@
 
   function updateButtons(){
     overlayRollBtn.disabled = !(waitingForUserRoll && !busy && !gameEnded);
-    historyBtn.disabled = busy || resultOverlay.classList.contains("show");
+    historyBtn.disabled = busy || resultOverlay.classList.contains("show") || orderOverlay.classList.contains("show");
   }
 
   function setBusy(flag){
@@ -768,8 +846,16 @@
     updateButtons();
   }
 
+  function getTurnSortedPlayers(){
+    return [...players].sort((a,b) => a.turnOrder - b.turnOrder);
+  }
+
+  function getCurrentPlayer(){
+    return getTurnSortedPlayers()[turnIndex];
+  }
+
   function updateTurnLabel(){
-    const current = players[turnIndex];
+    const current = getCurrentPlayer();
     turnLabelEl.textContent = `現在の番：${current.label}`;
   }
 
@@ -801,7 +887,7 @@
   }
 
   function openHistory(){
-    if(busy || resultOverlay.classList.contains("show")) return;
+    if(busy || resultOverlay.classList.contains("show") || orderOverlay.classList.contains("show")) return;
     historyOverlay.classList.add("show");
   }
 
@@ -849,10 +935,10 @@
 
     if(winner.id === "you"){
       resultTitle.textContent = "あなたの勝ち！";
-      resultSub.textContent = "先にゴールしました。";
+      resultSub.textContent = "やったね。先にゴールしました。";
     } else {
       resultTitle.textContent = `${winner.label}の勝ち！`;
-      resultSub.textContent = "先にゴールしました。";
+      resultSub.textContent = "惜しかった。あと少しでした。";
     }
 
     resultOverlay.classList.add("show");
@@ -862,6 +948,61 @@
   function hideResultScreen(){
     resultOverlay.classList.remove("show");
     updateButtons();
+  }
+
+  async function playEndingEmotion(winner){
+    if(winner.id === "you"){
+      const girlIndex = Math.floor(Math.random() * 3);
+      showGirl(girlIndex, rand(girls[girlIndex].winYou), false);
+      await wait(1700);
+      hideGirl();
+      await wait(200);
+    } else {
+      const girlIndex = winner.girlIndex;
+      showGirl(girlIndex, rand(girls[girlIndex].winCpu), false);
+      await wait(1700);
+      hideGirl();
+      await wait(200);
+
+      const comfortGirl = Math.floor(Math.random() * 3);
+      showGirl(comfortGirl, rand(girls[comfortGirl].loseToCpu), false);
+      await wait(1500);
+      hideGirl();
+      await wait(150);
+    }
+  }
+
+  async function playTurnOrderAnimation(){
+    orderOverlay.classList.add("show");
+    updateButtons();
+
+    const base = [...players];
+    for(let i = 0; i < 7; i++){
+      const temp = shuffle(base);
+      renderOrderList(temp, false);
+      orderSub.textContent = "シャッフル中…";
+      await wait(180);
+    }
+
+    const finalOrder = shuffle(base);
+    finalOrder.forEach((p, idx) => p.turnOrder = idx);
+    renderOrderList(finalOrder, true);
+    orderSub.textContent = "順番決定！";
+    addHistory(`順番決定：${finalOrder.map((p, idx) => `${idx + 1}番 ${p.label}`).join(" / ")}`);
+    await wait(1500);
+
+    orderOverlay.classList.remove("show");
+    updateButtons();
+  }
+
+  function renderOrderList(list, fixed){
+    orderList.innerHTML = "";
+    list.forEach((p, i) => {
+      const row = document.createElement("div");
+      row.className = "orderLine";
+      row.innerHTML = `<span>${i + 1}番</span><span>${p.label}${fixed ? "" : ""}</span>`;
+      orderList.appendChild(row);
+    });
   }
 
   function movePlayer(player, amount){
@@ -950,7 +1091,7 @@
   }
 
   async function introForCurrentTurn(){
-    const player = players[turnIndex];
+    const player = getCurrentPlayer();
     const girlIndex = getGirlIndexForTurn(player);
     currentSpeakerGirl = girlIndex;
     updateTurnLabel();
@@ -1017,13 +1158,20 @@
       addHistory(`${player.label} はイベントでもう1回。`);
       await showResultReaction(girlIndex, rand(girls[girlIndex].again));
 
+      waitingForUserRoll = false;
+      updateButtons();
+
       if(player.type === "human"){
         waitingForUserRoll = true;
         showGirl(girlIndex, rand(girls[girlIndex].introHuman), true);
         updateButtons();
       } else {
-        await wait(450);
-        await introForCurrentTurn();
+        await wait(300);
+        showGirl(girlIndex, rand(girls[girlIndex].introCpu), false);
+        await wait(1200);
+        hideGirl();
+        await wait(200);
+        await executeRoll(true);
       }
       return true;
     }
@@ -1037,29 +1185,23 @@
     updateButtons();
     updateRanking();
 
-    if(player.type === "human"){
-      addHistory("あなたがゴールして勝利。");
-      setSubInfo("あなたの勝ち");
-      showGirl(girlIndex, rand(girls[girlIndex].winYou), false);
-    } else {
-      addHistory(`${player.label} がゴール。`);
-      setSubInfo(`${player.label} の勝ち`);
-      showGirl(girlIndex, rand(girls[girlIndex].winCpu), false);
-    }
+    addHistory(`${player.label} がゴール。`);
 
     showDice("ゴール", "★");
-    await wait(1800);
+    await wait(1300);
     hideDice();
     await wait(150);
+
+    await playEndingEmotion(player);
     showResultScreen(player);
   }
 
-  async function executeRoll(){
+  async function executeRoll(isRepeat = false){
     if(gameEnded || busy) return;
 
     setBusy(true);
 
-    const player = players[turnIndex];
+    const player = getCurrentPlayer();
     const girlIndex = currentSpeakerGirl || getGirlIndexForTurn(player);
     const before = player.pos;
 
@@ -1068,7 +1210,7 @@
     hideGirl();
     await wait(250);
 
-    showDice("サイコロ…", "?");
+    showDice(isRepeat ? "もう一回…" : "サイコロ…", "?");
     await wait(350);
     diceResultEl.textContent = "1";
     await wait(220);
@@ -1115,12 +1257,18 @@
     await introForCurrentTurn();
   }
 
-  async function resetGame(){
+  async function resetGame(showOrder = true){
     hideGirl();
     hideDice();
     hideResultScreen();
+    orderOverlay.classList.remove("show");
     clearActiveStep();
-    players.forEach(p => p.pos = 0);
+
+    players.forEach(p => {
+      p.pos = 0;
+      p.turnOrder = 0;
+    });
+
     turnIndex = 0;
     gameEnded = false;
     busy = false;
@@ -1133,18 +1281,25 @@
     drawBoard();
     updateRanking();
     renderHistory();
-    updateTurnLabel();
     setSubInfo("ゲーム開始");
-    addHistory("ゲーム開始。");
     updateButtons();
 
-    await wait(700);
+    if(showOrder){
+      await playTurnOrderAnimation();
+    } else {
+      const fixed = [...players];
+      fixed.forEach((p, idx) => p.turnOrder = idx);
+    }
+
+    updateTurnLabel();
+    addHistory("ゲーム開始。");
+    await wait(500);
     await introForCurrentTurn();
   }
 
   overlayRollBtn.addEventListener("click", async () => {
     if(!waitingForUserRoll || busy || gameEnded) return;
-    await executeRoll();
+    await executeRoll(false);
   });
 
   historyBtn.addEventListener("click", openHistory);
@@ -1153,11 +1308,11 @@
     if(e.target === historyOverlay) closeHistory();
   });
 
-  resetBtn.addEventListener("click", resetGame);
-  retryBtn.addEventListener("click", resetGame);
-  topBtn.addEventListener("click", resetGame);
+  resetBtn.addEventListener("click", () => resetGame(true));
+  retryBtn.addEventListener("click", () => resetGame(true));
+  topBtn.addEventListener("click", () => resetGame(true));
 
-  resetGame();
+  resetGame(true);
 </script>
 </body>
 </html>
