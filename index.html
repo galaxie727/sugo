@@ -738,8 +738,7 @@
   }
 
   function getGirlIndexForTurn(player){
-    if(player.type === "human") return Math.floor(Math.random() * 3);
-    return player.girlIndex;
+    return player.type === "human" ? Math.floor(Math.random() * 3) : player.girlIndex;
   }
 
   function updateButtons(){
@@ -749,6 +748,12 @@
 
   function setBusy(flag){
     busy = flag;
+    updateButtons();
+  }
+
+  function forceUserReady(){
+    busy = false;
+    waitingForUserRoll = true;
     updateButtons();
   }
 
@@ -806,6 +811,7 @@
     girlBg.src = girls[girlIndex].image;
     girlActionEl.classList.toggle("show", showAction);
     girlOverlay.classList.add("show");
+    updateButtons();
   }
 
   function hideGirl(){
@@ -830,7 +836,6 @@
   function showResultScreen(winner){
     const sorted = getFinalRanking();
     resultList.innerHTML = "";
-
     sorted.forEach((p, i) => {
       const row = document.createElement("div");
       row.className = "resultLine";
@@ -841,7 +846,7 @@
     if(winner.id === "you"){
       resultTitle.textContent = "あなたの勝ち！";
       resultSub.textContent = "やったね。先にゴールしました。";
-    } else {
+    }else{
       resultTitle.textContent = `${winner.label}の勝ち！`;
       resultSub.textContent = "惜しかった。あと少しでした。";
     }
@@ -862,7 +867,7 @@
       await wait(1700);
       hideGirl();
       await wait(200);
-    } else {
+    }else{
       const girlIndex = winner.girlIndex;
       showGirl(girlIndex, rand(girls[girlIndex].winCpu), false);
       await wait(1700);
@@ -1008,13 +1013,12 @@
     updateTurnLabel();
 
     if(player.type === "human"){
-      waitingForUserRoll = true;
+      forceUserReady();
       setSubInfo("あなたの番です");
       showGirl(girlIndex, rand(girls[girlIndex].introHuman), true);
-      updateButtons();
-    } else {
+    }else{
       waitingForUserRoll = false;
-      updateButtons();
+      setBusy(false);
       setSubInfo("チー娘の番です");
       showGirl(girlIndex, rand(girls[girlIndex].introCpu), false);
       await wait(1700);
@@ -1027,6 +1031,8 @@
   async function introRepeatForCpu(player){
     const girlIndex = player.girlIndex;
     currentSpeakerGirl = girlIndex;
+    waitingForUserRoll = false;
+    setBusy(false);
     setSubInfo(`${player.label} はもう一回`);
     showGirl(girlIndex, rand(girls[girlIndex].repeatCpu), false);
     await wait(1200);
@@ -1071,15 +1077,10 @@
       addHistory(`${player.label} はイベントでもう1回。`);
       await showResultReaction(girlIndex, rand(girls[girlIndex].again));
 
-      waitingForUserRoll = false;
-      updateButtons();
-
       if(player.type === "human"){
-        waitingForUserRoll = true;
+        forceUserReady();
         showGirl(girlIndex, rand(girls[girlIndex].introHuman), true);
-        updateButtons();
-      } else {
-        setBusy(false);
+      }else{
         await introRepeatForCpu(player);
         await executeRoll(true, true);
       }
@@ -1092,7 +1093,7 @@
   async function handleWin(player){
     gameEnded = true;
     waitingForUserRoll = false;
-    updateButtons();
+    setBusy(false);
     updateRanking();
 
     addHistory(`${player.label} がゴール。`);
@@ -1147,18 +1148,12 @@
 
     if(player.pos >= GOAL){
       await handleWin(player);
-      setBusy(false);
       return;
     }
 
     const again = await handleEvent(player, girlIndex);
-    if(gameEnded){
-      setBusy(false);
-      return;
-    }
-    if(again){
-      return;
-    }
+    if(gameEnded) return;
+    if(again) return;
 
     if(!keepTurn){
       turnIndex = (turnIndex + 1) % players.length;
@@ -1198,7 +1193,7 @@
 
     if(showOrder){
       await playTurnOrderAnimation();
-    } else {
+    }else{
       players.forEach((p, idx) => p.turnOrder = idx);
     }
 
