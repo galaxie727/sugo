@@ -9,7 +9,6 @@
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
   }
-
   html,body{
     margin:0;
     padding:0;
@@ -19,12 +18,10 @@
     color:#fff;
     font-family:sans-serif;
   }
-
   body{
     display:flex;
     justify-content:center;
   }
-
   .app{
     width:100%;
     max-width:430px;
@@ -34,7 +31,6 @@
       linear-gradient(180deg,#10131d 0%,#06080d 100%);
     padding:12px 10px 18px;
   }
-
   .title{
     text-align:center;
     font-size:24px;
@@ -42,19 +38,16 @@
     letter-spacing:.08em;
     margin:4px 0 12px;
   }
-
   .panel{
     background:rgba(255,255,255,.04);
     border:1px solid rgba(255,255,255,.07);
     border-radius:22px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
   }
-
   .statusBox{
     padding:14px 14px 10px;
     margin-bottom:12px;
   }
-
   .statusTop{
     display:flex;
     align-items:center;
@@ -64,7 +57,6 @@
     font-weight:800;
     margin-bottom:10px;
   }
-
   .diceArea{
     display:flex;
     align-items:center;
@@ -73,19 +65,16 @@
     min-height:74px;
     font-weight:900;
   }
-
   .diceEmoji{
     font-size:44px;
     line-height:1;
   }
-
   .diceNum{
     font-size:58px;
     line-height:1;
     min-width:48px;
     text-align:center;
   }
-
   .subInfo{
     margin-top:8px;
     text-align:center;
@@ -93,24 +82,20 @@
     opacity:.75;
     min-height:18px;
   }
-
   .boardWrap{
     padding:12px;
     margin-bottom:12px;
   }
-
   .boardTitleRow{
     display:flex;
     justify-content:space-between;
     align-items:center;
     margin-bottom:10px;
   }
-
   .boardTitle{
     font-size:14px;
     font-weight:900;
   }
-
   .miniBtn{
     appearance:none;
     border:1px solid rgba(255,255,255,.08);
@@ -122,13 +107,11 @@
     font-weight:800;
     cursor:pointer;
   }
-
   .board{
     display:grid;
     grid-template-columns:repeat(5,1fr);
     gap:7px;
   }
-
   .cell{
     min-height:78px;
     border-radius:16px;
@@ -139,37 +122,22 @@
     padding:8px 6px 6px;
     transition:transform .12s ease, box-shadow .12s ease;
   }
-
   .cell.goal{
     background:linear-gradient(180deg,#7f6800 0%,#463700 100%);
     border-color:rgba(255,220,120,.35);
   }
-
-  .cell.event-plus{
-    box-shadow:inset 0 0 0 1px rgba(120,255,160,.18);
-  }
-
-  .cell.event-minus{
-    box-shadow:inset 0 0 0 1px rgba(255,140,140,.16);
-  }
-
-  .cell.event-again{
-    box-shadow:inset 0 0 0 1px rgba(140,200,255,.16);
-  }
-
+  .cell.event-plus{ box-shadow:inset 0 0 0 1px rgba(120,255,160,.18); }
+  .cell.event-minus{ box-shadow:inset 0 0 0 1px rgba(255,140,140,.16); }
+  .cell.event-again{ box-shadow:inset 0 0 0 1px rgba(140,200,255,.16); }
   .cell.active-step{
     transform:scale(1.03);
-    box-shadow:
-      inset 0 0 0 1px rgba(255,255,255,.16),
-      0 0 0 2px rgba(255,255,255,.08);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.16), 0 0 0 2px rgba(255,255,255,.08);
   }
-
   .cellNum{
     font-size:11px;
     font-weight:900;
     opacity:.95;
   }
-
   .eventMark{
     position:absolute;
     right:6px;
@@ -178,7 +146,6 @@
     font-weight:900;
     opacity:.92;
   }
-
   .tokens{
     position:absolute;
     left:6px;
@@ -190,7 +157,6 @@
     min-height:24px;
     align-items:flex-end;
   }
-
   .token{
     min-width:23px;
     height:23px;
@@ -203,7 +169,6 @@
     font-weight:900;
     color:#111;
   }
-
   .you{ background:#fff; }
   .a{ background:#ffbfdc; }
   .b{ background:#bedcff; }
@@ -214,7 +179,6 @@
     gap:8px;
     margin-bottom:12px;
   }
-
   .mainBtn{
     appearance:none;
     border:none;
@@ -224,7 +188,6 @@
     font-weight:900;
     cursor:pointer;
   }
-
   #resetBtn{
     width:100%;
     background:#272b3b;
@@ -235,13 +198,11 @@
   .ranking{
     padding:12px;
   }
-
   .rankingTitle{
     font-size:14px;
     font-weight:900;
     margin-bottom:8px;
   }
-
   .rankLine{
     display:flex;
     justify-content:space-between;
@@ -266,7 +227,6 @@
     pointer-events:none;
     transition:opacity .26s ease;
   }
-
   .historyOverlay.show,
   .girlOverlay.show,
   .diceOverlay.show,
@@ -276,10 +236,7 @@
     pointer-events:auto;
   }
 
-  .historyOverlay{
-    background:rgba(0,0,0,.55);
-  }
-
+  .historyOverlay{ background:rgba(0,0,0,.55); }
   .historySheet{
     position:absolute;
     left:50%;
@@ -295,11 +252,7 @@
     flex-direction:column;
     overflow:hidden;
   }
-
-  .historyOverlay.show .historySheet{
-    bottom:0;
-  }
-
+  .historyOverlay.show .historySheet{ bottom:0; }
   .historyHead{
     padding:14px 14px 10px;
     display:flex;
@@ -307,12 +260,10 @@
     align-items:center;
     border-bottom:1px solid rgba(255,255,255,.06);
   }
-
   .historyTitle{
     font-size:16px;
     font-weight:900;
   }
-
   .closeBtn{
     appearance:none;
     border:1px solid rgba(255,255,255,.08);
@@ -324,20 +275,17 @@
     font-weight:800;
     cursor:pointer;
   }
-
   .historyBody{
     padding:10px 14px 20px;
     overflow-y:auto;
     flex:1;
   }
-
   .historyLine{
     padding:10px 0;
     border-bottom:1px solid rgba(255,255,255,.06);
     font-size:14px;
     line-height:1.55;
   }
-
   .historyEmpty{
     opacity:.65;
     font-size:14px;
@@ -348,7 +296,6 @@
     z-index:100;
     background:#000;
   }
-
   .girlBg{
     position:absolute;
     inset:0;
@@ -358,14 +305,11 @@
     object-position:center center;
     filter:brightness(.96);
   }
-
   .girlShade{
     position:absolute;
     inset:0;
-    background:
-      linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,.02) 28%, rgba(0,0,0,.20) 100%);
+    background:linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,.02) 28%, rgba(0,0,0,.20) 100%);
   }
-
   .girlUi{
     position:absolute;
     inset:0;
@@ -374,7 +318,6 @@
     justify-content:space-between;
     padding:20px 16px max(20px, env(safe-area-inset-bottom));
   }
-
   .girlSpeech{
     width:100%;
     background:rgba(255,255,255,.10);
@@ -386,7 +329,6 @@
     border:1px solid rgba(255,255,255,.12);
     box-shadow:0 8px 24px rgba(0,0,0,.08);
   }
-
   .girlName{
     display:inline-block;
     margin-bottom:12px;
@@ -397,7 +339,6 @@
     font-size:14px;
     font-weight:900;
   }
-
   .girlText{
     font-size:18px;
     font-weight:900;
@@ -405,21 +346,13 @@
     min-height:42px;
     text-shadow:0 1px 2px rgba(0,0,0,.28);
   }
-
   .girlBottom{
     display:flex;
     flex-direction:column;
     gap:10px;
   }
-
-  .girlAction{
-    display:none;
-  }
-
-  .girlAction.show{
-    display:block;
-  }
-
+  .girlAction{ display:none; }
+  .girlAction.show{ display:block; }
   .overlayRollBtn{
     appearance:none;
     width:100%;
@@ -435,16 +368,12 @@
     box-shadow:0 8px 20px rgba(0,0,0,.12);
     cursor:pointer;
   }
-
-  .overlayRollBtn:disabled{
-    opacity:.45;
-  }
+  .overlayRollBtn:disabled{ opacity:.45; }
 
   .diceOverlay{
     background:rgba(8,8,12,.92);
     z-index:110;
   }
-
   .diceStage{
     position:absolute;
     inset:0;
@@ -455,18 +384,15 @@
     gap:24px;
     padding:24px;
   }
-
   .diceLabel{
     font-size:20px;
     font-weight:900;
     opacity:.95;
   }
-
   .diceBig{
     font-size:100px;
     line-height:1;
   }
-
   .diceResult{
     font-size:84px;
     font-weight:900;
@@ -478,7 +404,6 @@
     z-index:120;
     background:rgba(5,7,12,.92);
   }
-
   .resultBox{
     position:absolute;
     left:50%;
@@ -493,14 +418,12 @@
     padding:22px 18px 18px;
     box-shadow:0 14px 36px rgba(0,0,0,.22);
   }
-
   .resultTitle{
     font-size:28px;
     font-weight:900;
     text-align:center;
     margin-bottom:10px;
   }
-
   .resultSub{
     text-align:center;
     font-size:15px;
@@ -508,14 +431,12 @@
     margin-bottom:16px;
     line-height:1.6;
   }
-
   .resultList{
     background:rgba(255,255,255,.05);
     border-radius:18px;
     padding:10px;
     margin-bottom:14px;
   }
-
   .resultLine{
     display:flex;
     justify-content:space-between;
@@ -527,17 +448,12 @@
     font-size:14px;
     font-weight:800;
   }
-
-  .resultLine:last-child{
-    margin-bottom:0;
-  }
-
+  .resultLine:last-child{ margin-bottom:0; }
   .resultButtons{
     display:flex;
     flex-direction:column;
     gap:10px;
   }
-
   .resultBtn{
     appearance:none;
     border:none;
@@ -547,12 +463,10 @@
     font-weight:900;
     cursor:pointer;
   }
-
   .resultRetry{
     background:#fff;
     color:#111;
   }
-
   .resultTop{
     background:#2b3044;
     color:#fff;
@@ -563,7 +477,6 @@
     z-index:130;
     background:rgba(5,7,12,.94);
   }
-
   .orderBox{
     position:absolute;
     left:50%;
@@ -578,14 +491,12 @@
     padding:22px 18px 18px;
     box-shadow:0 14px 36px rgba(0,0,0,.22);
   }
-
   .orderTitle{
     font-size:24px;
     font-weight:900;
     text-align:center;
     margin-bottom:12px;
   }
-
   .orderSub{
     text-align:center;
     font-size:14px;
@@ -593,13 +504,11 @@
     margin-bottom:14px;
     min-height:20px;
   }
-
   .orderList{
     display:flex;
     flex-direction:column;
     gap:8px;
   }
-
   .orderLine{
     display:flex;
     justify-content:space-between;
@@ -611,9 +520,7 @@
     font-weight:900;
   }
 
-  .footerSpace{
-    height:10px;
-  }
+  .footerSpace{ height:10px; }
 </style>
 </head>
 <body>
@@ -655,13 +562,11 @@
   <div class="girlOverlay" id="girlOverlay">
     <img src="girl1.png" alt="チー娘" class="girlBg" id="girlBg">
     <div class="girlShade"></div>
-
     <div class="girlUi">
       <div class="girlSpeech">
         <div class="girlName" id="girlName">チー娘A</div>
         <div class="girlText" id="girlText">いくよ。</div>
       </div>
-
       <div class="girlBottom">
         <div class="girlAction" id="girlAction">
           <button class="overlayRollBtn" id="overlayRollBtn" type="button">サイコロをふる</button>
@@ -725,6 +630,7 @@
       image:"girl1.png",
       introHuman:["あなたの番だよ。","ここを押したら振るよ。","準備できたらどうぞ。"],
       introCpu:["いくよ。","始まるよ。","見てて。"],
+      repeatCpu:["もう一回だね。","続けていくよ。","もう一度振るよ。"],
       move:["いい感じ。","まあまあ進んだね。","その調子。"],
       plus:["ちょっと得したね。","ラッキーだよ。","進んでいいよ。"],
       minus:["ちょっと戻ろっか。","少し下がるね。","ここは戻るみたい。"],
@@ -738,6 +644,7 @@
       image:"girl2.png",
       introHuman:["ほら、あなたの番。","ここを押したら始まるよ。","準備できた？"],
       introCpu:["ほら、始まるよ。","見てなさい。","出るかな。"],
+      repeatCpu:["もう一回ね。","続けるよ。","まだ私の番。"],
       move:["悪くない。","まあ、こんなもんかな。","まだこれからでしょ。"],
       plus:["ちょっと運いいじゃん。","はい、進んでいいよ。","ラッキーなんじゃない？"],
       minus:["少し戻るみたい。","まあ、そういう時もある。","戻ってね。"],
@@ -751,6 +658,7 @@
       image:"girl3.png",
       introHuman:["あなたの番。","ここを押して。","……準備できたら。"],
       introCpu:["……いく。","始まる。","出る。"],
+      repeatCpu:["……もう一回。","続ける。","まだ終わらない。"],
       move:["進んだ。","悪くない。","まだ行ける。"],
       plus:["さらに進む。","得した。","前へ。"],
       minus:["少し下がる。","戻る。","……しかたない。"],
@@ -830,9 +738,7 @@
   }
 
   function getGirlIndexForTurn(player){
-    if(player.type === "human"){
-      return Math.floor(Math.random() * 3);
-    }
+    if(player.type === "human") return Math.floor(Math.random() * 3);
     return player.girlIndex;
   }
 
@@ -877,7 +783,6 @@
       historyBody.appendChild(empty);
       return;
     }
-
     historyLogs.forEach(line => {
       const div = document.createElement("div");
       div.className = "historyLine";
@@ -979,14 +884,14 @@
     const base = [...players];
     for(let i = 0; i < 7; i++){
       const temp = shuffle(base);
-      renderOrderList(temp, false);
+      renderOrderList(temp);
       orderSub.textContent = "シャッフル中…";
       await wait(180);
     }
 
     const finalOrder = shuffle(base);
     finalOrder.forEach((p, idx) => p.turnOrder = idx);
-    renderOrderList(finalOrder, true);
+    renderOrderList(finalOrder);
     orderSub.textContent = "順番決定！";
     addHistory(`順番決定：${finalOrder.map((p, idx) => `${idx + 1}番 ${p.label}`).join(" / ")}`);
     await wait(1500);
@@ -995,25 +900,19 @@
     updateButtons();
   }
 
-  function renderOrderList(list, fixed){
+  function renderOrderList(list){
     orderList.innerHTML = "";
     list.forEach((p, i) => {
       const row = document.createElement("div");
       row.className = "orderLine";
-      row.innerHTML = `<span>${i + 1}番</span><span>${p.label}${fixed ? "" : ""}</span>`;
+      row.innerHTML = `<span>${i + 1}番</span><span>${p.label}</span>`;
       orderList.appendChild(row);
     });
   }
 
-  function movePlayer(player, amount){
-    player.pos = Math.max(0, Math.min(GOAL, player.pos + amount));
-  }
-
   function clearActiveStep(){
     activeStepCell = null;
-    document.querySelectorAll(".cell.active-step").forEach(el => {
-      el.classList.remove("active-step");
-    });
+    document.querySelectorAll(".cell.active-step").forEach(el => el.classList.remove("active-step"));
   }
 
   function drawBoard(){
@@ -1045,7 +944,6 @@
 
       const tokens = document.createElement("div");
       tokens.className = "tokens";
-
       players.forEach(player => {
         if(player.pos === i){
           const token = document.createElement("div");
@@ -1063,7 +961,6 @@
   function updateRanking(){
     const sorted = getFinalRanking();
     rankingBodyEl.innerHTML = "";
-
     sorted.forEach((p, index) => {
       const row = document.createElement("div");
       row.className = "rankLine";
@@ -1072,9 +969,8 @@
     });
   }
 
-  async function animateMove(player, steps){
+  async function animateForwardMove(player, steps){
     if(steps <= 0) return;
-
     for(let i = 0; i < steps; i++){
       if(player.pos >= GOAL) break;
       player.pos += 1;
@@ -1084,7 +980,22 @@
       setSubInfo(`${player.label} が ${player.pos} マス目へ`);
       await wait(STEP_DELAY);
     }
+    clearActiveStep();
+    drawBoard();
+    updateRanking();
+  }
 
+  async function animateBackwardMove(player, steps){
+    if(steps <= 0) return;
+    for(let i = 0; i < steps; i++){
+      if(player.pos <= 0) break;
+      player.pos -= 1;
+      activeStepCell = player.pos;
+      drawBoard();
+      updateRanking();
+      setSubInfo(`${player.label} が ${player.pos} マス目へ戻る`);
+      await wait(STEP_DELAY);
+    }
     clearActiveStep();
     drawBoard();
     updateRanking();
@@ -1109,8 +1020,18 @@
       await wait(1700);
       hideGirl();
       await wait(350);
-      await executeRoll();
+      await executeRoll(false, false);
     }
+  }
+
+  async function introRepeatForCpu(player){
+    const girlIndex = player.girlIndex;
+    currentSpeakerGirl = girlIndex;
+    setSubInfo(`${player.label} はもう一回`);
+    showGirl(girlIndex, rand(girls[girlIndex].repeatCpu), false);
+    await wait(1200);
+    hideGirl();
+    await wait(250);
   }
 
   async function showResultReaction(girlIndex, text){
@@ -1127,34 +1048,26 @@
     if(event.type === "plus"){
       const before = player.pos;
       setSubInfo(`イベント：+${event.value}マス`);
-      await animateMove(player, event.value);
+      await animateForwardMove(player, event.value);
       addHistory(`${player.label} はイベントで ${event.value} マス進んだ（${before} → ${player.pos}）`);
       await showResultReaction(girlIndex, rand(girls[girlIndex].plus));
 
       if(player.pos >= GOAL){
-        await handleWin(player, girlIndex);
+        await handleWin(player);
       }
       return false;
     }
 
     if(event.type === "minus"){
       const before = player.pos;
-      player.pos = Math.max(0, player.pos - event.value);
-      activeStepCell = player.pos;
-      drawBoard();
-      updateRanking();
-      await wait(350);
-      clearActiveStep();
-      drawBoard();
-      updateRanking();
       setSubInfo(`イベント：-${event.value}マス`);
+      await animateBackwardMove(player, event.value);
       addHistory(`${player.label} はイベントで ${event.value} マス戻った（${before} → ${player.pos}）`);
       await showResultReaction(girlIndex, rand(girls[girlIndex].minus));
       return false;
     }
 
     if(event.type === "again"){
-      setSubInfo("イベント：もう1回");
       addHistory(`${player.label} はイベントでもう1回。`);
       await showResultReaction(girlIndex, rand(girls[girlIndex].again));
 
@@ -1166,12 +1079,9 @@
         showGirl(girlIndex, rand(girls[girlIndex].introHuman), true);
         updateButtons();
       } else {
-        await wait(300);
-        showGirl(girlIndex, rand(girls[girlIndex].introCpu), false);
-        await wait(1200);
-        hideGirl();
-        await wait(200);
-        await executeRoll(true);
+        setBusy(false);
+        await introRepeatForCpu(player);
+        await executeRoll(true, true);
       }
       return true;
     }
@@ -1179,7 +1089,7 @@
     return false;
   }
 
-  async function handleWin(player, girlIndex){
+  async function handleWin(player){
     gameEnded = true;
     waitingForUserRoll = false;
     updateButtons();
@@ -1196,7 +1106,7 @@
     showResultScreen(player);
   }
 
-  async function executeRoll(isRepeat = false){
+  async function executeRoll(isRepeat = false, keepTurn = false){
     if(gameEnded || busy) return;
 
     setBusy(true);
@@ -1229,14 +1139,14 @@
     hideDice();
     await wait(150);
 
-    await animateMove(player, dice);
+    await animateForwardMove(player, dice);
     addHistory(`${player.label} が ${dice} マス進んだ（${before} → ${player.pos}）`);
     setSubInfo(`${player.pos} マス目に到着`);
 
     await showResultReaction(girlIndex, rand(girls[girlIndex].move));
 
     if(player.pos >= GOAL){
-      await handleWin(player, girlIndex);
+      await handleWin(player);
       setBusy(false);
       return;
     }
@@ -1247,11 +1157,13 @@
       return;
     }
     if(again){
-      setBusy(false);
       return;
     }
 
-    turnIndex = (turnIndex + 1) % players.length;
+    if(!keepTurn){
+      turnIndex = (turnIndex + 1) % players.length;
+    }
+
     setBusy(false);
     await wait(700);
     await introForCurrentTurn();
@@ -1287,8 +1199,7 @@
     if(showOrder){
       await playTurnOrderAnimation();
     } else {
-      const fixed = [...players];
-      fixed.forEach((p, idx) => p.turnOrder = idx);
+      players.forEach((p, idx) => p.turnOrder = idx);
     }
 
     updateTurnLabel();
@@ -1299,7 +1210,7 @@
 
   overlayRollBtn.addEventListener("click", async () => {
     if(!waitingForUserRoll || busy || gameEnded) return;
-    await executeRoll(false);
+    await executeRoll(false, false);
   });
 
   historyBtn.addEventListener("click", openHistory);
