@@ -51,9 +51,7 @@
     font-size:15px;font-weight:900;cursor:pointer;
     background:#222738;color:#d8dbe7;
   }
-  .tabBtn.active{
-    background:#fff;color:#111;
-  }
+  .tabBtn.active{background:#fff;color:#111}
 
   .tabPane{display:none}
   .tabPane.active{display:block}
@@ -121,20 +119,13 @@
   }
 
   .infoWrap{padding:12px;margin-bottom:12px}
-  .infoGrid{
-    display:grid;gap:10px;
-  }
+  .infoGrid{display:grid;gap:10px}
   .infoCard{
     background:rgba(255,255,255,.04);
-    border-radius:16px;padding:12px 12px;
-    border:1px solid rgba(255,255,255,.05);
+    border-radius:16px;padding:12px 12px;border:1px solid rgba(255,255,255,.05);
   }
-  .infoLabel{
-    font-size:12px;font-weight:800;opacity:.7;margin-bottom:6px;
-  }
-  .infoValue{
-    font-size:16px;font-weight:900;line-height:1.5;
-  }
+  .infoLabel{font-size:12px;font-weight:800;opacity:.7;margin-bottom:6px}
+  .infoValue{font-size:16px;font-weight:900;line-height:1.5}
 
   .ranking{padding:12px}
   .rankingTitle{font-size:14px;font-weight:900;margin-bottom:8px}
@@ -255,18 +246,14 @@
   .modeBtnDesc{display:block;font-size:13px;opacity:.85;line-height:1.55}
 
   .partnerOverlay{z-index:145;background:rgba(5,7,12,.96)}
-  .partnerGrid{
-    display:grid;grid-template-columns:1fr 1fr;gap:12px;
-  }
+  .partnerGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .partnerBtn{
     appearance:none;border:none;border-radius:18px;background:rgba(255,255,255,.07);color:#fff;cursor:pointer;padding:10px;
   }
   .partnerThumb{
     width:100%;aspect-ratio:1/1;border-radius:14px;object-fit:cover;display:block;margin-bottom:8px;
   }
-  .partnerName{
-    font-size:15px;font-weight:900;
-  }
+  .partnerName{font-size:15px;font-weight:900}
 
   .footerSpace{height:10px}
 </style>
@@ -426,15 +413,8 @@
     SURVIVAL: "survival"
   };
 
-  const NORMAL_CONFIG = {
-    goal: 20
-  };
-
-  const SURVIVAL_CONFIG = {
-    size: 12,
-    traps: [2, 5, 9]
-  };
-
+  const NORMAL_CONFIG = { goal: 20 };
+  const SURVIVAL_CONFIG = { size: 12, traps: [2, 5, 9] };
   const STEP_DELAY = 260;
 
   const allGirls = [
@@ -587,15 +567,13 @@
   function rand(arr){
     return arr[Math.floor(Math.random()*arr.length)];
   }
-
   function wait(ms){
     return new Promise(resolve=>setTimeout(resolve, ms));
   }
-
   function shuffle(arr){
-    const a = [...arr];
+    const a=[...arr];
     for(let i=a.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*(i+1));
+      const j=Math.floor(Math.random()*(i+1));
       [a[i],a[j]]=[a[j],a[i]];
     }
     return a;
@@ -652,7 +630,7 @@
   function buildPlayersFromPartner(){
     const enemies = allGirls.filter(g => g.id !== partnerGirl.id);
     players = [
-      { id:"you", label:"あなた", short:"自", pos:0, type:"human", alive:true, turnOrder:0 },
+      { id:"you", label:"あなた", short:"自", pos:0, type:"human", alive:true, turnOrder:0, girl:null },
       ...enemies.map(g => ({
         id:g.id,
         label:g.name,
@@ -666,12 +644,17 @@
     ];
   }
 
+  function getSpeakerGirlForPlayer(player){
+    return player.type === "human" ? partnerGirl : player.girl;
+  }
+
   function updateTopInfo(){
     const current = getCurrentPlayer();
     turnLabelEl.textContent = current ? `現在の番：${current.label}` : "現在の番：-";
     goalLabelEl.textContent = gameMode === MODE.SURVIVAL ? "生き残り" : `ゴール：${NORMAL_CONFIG.goal}マス`;
     boardTitleEl.textContent = gameMode === MODE.SURVIVAL ? "盤面（サバイバル）" : "盤面";
     boardEl.classList.toggle("loopBoard", gameMode === MODE.SURVIVAL);
+
     infoModeEl.textContent = gameMode === MODE.SURVIVAL ? "サバイバルすごろく" : "通常すごろく";
     infoPartnerEl.textContent = partnerGirl ? partnerGirl.name : "-";
     infoEnemiesEl.textContent = players.filter(p=>p.id!=="you").map(p=>p.label).join(" / ");
@@ -707,12 +690,12 @@
     });
   }
 
-  function showGirl(text, showAction=false){
-    if(!partnerGirl) return;
-    currentSpeakerGirl = partnerGirl;
-    girlNameEl.textContent = partnerGirl.name;
+  function showGirlByGirl(girl, text, showAction=false){
+    if(!girl) return;
+    currentSpeakerGirl = girl;
+    girlNameEl.textContent = girl.name;
     girlTextEl.textContent = text;
-    girlBg.src = partnerGirl.image;
+    girlBg.src = girl.image;
     girlActionEl.classList.toggle("show", showAction);
     girlOverlay.classList.add("show");
     updateButtons();
@@ -907,15 +890,17 @@
     if(!player) return;
     updateTopInfo();
 
+    const speaker = getSpeakerGirlForPlayer(player);
+
     if(player.type === "human"){
       forceUserReady();
       setSubInfo("あなたの番です");
-      showGirl(rand(partnerGirl.introHuman), true);
+      showGirlByGirl(speaker, rand(speaker.introHuman), true);
     }else{
       waitingForUserRoll = false;
       setBusy(false);
       setSubInfo(`${player.label} の番です`);
-      showGirl(rand(partnerGirl.introCpu), false);
+      showGirlByGirl(speaker, rand(speaker.introCpu), false);
       await wait(1700);
       hideGirl();
       await wait(350);
@@ -924,17 +909,18 @@
   }
 
   async function introRepeatForCpu(player){
+    const speaker = getSpeakerGirlForPlayer(player);
     waitingForUserRoll = false;
     setBusy(false);
     setSubInfo(`${player.label} はもう一回`);
-    showGirl(rand(partnerGirl.repeatCpu), false);
+    showGirlByGirl(speaker, rand(speaker.repeatCpu), false);
     await wait(1200);
     hideGirl();
     await wait(250);
   }
 
-  async function showResultReaction(text){
-    showGirl(text, false);
+  async function showResultReactionByGirl(girl, text){
+    showGirlByGirl(girl, text, false);
     await wait(1700);
     hideGirl();
     await wait(280);
@@ -950,19 +936,22 @@
     drawBoard();
     updateRanking();
     setSubInfo(`${player.label} は脱落`);
-    await showResultReaction(rand(partnerGirl.trap));
+    const speaker = getSpeakerGirlForPlayer(player);
+    await showResultReactionByGirl(speaker, rand(speaker.trap));
   }
 
   async function handleNormalEvent(player){
     const event = normalEventMap[player.pos];
     if(!event || player.pos >= NORMAL_CONFIG.goal) return false;
 
+    const speaker = getSpeakerGirlForPlayer(player);
+
     if(event.type === "plus"){
       const before = player.pos;
       setSubInfo(`イベント：+${event.value}マス`);
       await animateForwardMove(player, event.value);
       addHistory(`${player.label} はイベントで ${event.value} マス進んだ（${before} → ${player.pos}）`);
-      await showResultReaction(rand(partnerGirl.plus));
+      await showResultReactionByGirl(speaker, rand(speaker.plus));
       if(player.pos >= NORMAL_CONFIG.goal){
         await handleWin(player);
       }
@@ -974,16 +963,16 @@
       setSubInfo(`イベント：-${event.value}マス`);
       await animateBackwardMove(player, event.value);
       addHistory(`${player.label} はイベントで ${event.value} マス戻った（${before} → ${player.pos}）`);
-      await showResultReaction(rand(partnerGirl.minus));
+      await showResultReactionByGirl(speaker, rand(speaker.minus));
       return false;
     }
 
     if(event.type === "again"){
       addHistory(`${player.label} はイベントでもう1回。`);
-      await showResultReaction(rand(partnerGirl.again));
+      await showResultReactionByGirl(speaker, rand(speaker.again));
       if(player.type === "human"){
         forceUserReady();
-        showGirl(rand(partnerGirl.introHuman), true);
+        showGirlByGirl(speaker, rand(speaker.introHuman), true);
       }else{
         await introRepeatForCpu(player);
         await executeRoll(true, true);
@@ -995,8 +984,10 @@
   }
 
   async function handleSurvivalEvent(player){
+    const speaker = getSpeakerGirlForPlayer(player);
+
     if(!SURVIVAL_CONFIG.traps.includes(player.pos)){
-      await showResultReaction(rand(partnerGirl.survivalAlive));
+      await showResultReactionByGirl(speaker, rand(speaker.survivalAlive));
       return false;
     }
 
@@ -1018,21 +1009,23 @@
   }
 
   async function playEndingEmotion(winner){
+    const winnerSpeaker = getSpeakerGirlForPlayer(winner);
+
     if(gameMode === MODE.SURVIVAL){
       if(winner.id === "you"){
-        await showResultReaction(rand(partnerGirl.survivalYou));
+        await showResultReactionByGirl(partnerGirl, rand(partnerGirl.survivalYou));
       }else{
-        await showResultReaction(rand(partnerGirl.survivalCpu));
-        await showResultReaction(rand(partnerGirl.loseToCpu));
+        await showResultReactionByGirl(winnerSpeaker, rand(winnerSpeaker.survivalCpu));
+        await showResultReactionByGirl(partnerGirl, rand(partnerGirl.loseToCpu));
       }
       return;
     }
 
     if(winner.id === "you"){
-      await showResultReaction(rand(partnerGirl.winYou));
+      await showResultReactionByGirl(partnerGirl, rand(partnerGirl.winYou));
     }else{
-      await showResultReaction(rand(partnerGirl.winCpu));
-      await showResultReaction(rand(partnerGirl.loseToCpu));
+      await showResultReactionByGirl(winnerSpeaker, rand(winnerSpeaker.winCpu));
+      await showResultReactionByGirl(partnerGirl, rand(partnerGirl.loseToCpu));
     }
   }
 
@@ -1099,6 +1092,8 @@
     }
 
     const before = player.pos;
+    const speaker = getSpeakerGirlForPlayer(player);
+
     waitingForUserRoll = false;
     updateButtons();
     hideGirl();
@@ -1128,7 +1123,7 @@
     setSubInfo(`${player.pos} マス目に到着`);
 
     if(gameMode === MODE.NORMAL){
-      await showResultReaction(rand(partnerGirl.move));
+      await showResultReactionByGirl(speaker, rand(speaker.move));
     }
 
     if(gameMode === MODE.NORMAL && player.pos >= NORMAL_CONFIG.goal){
