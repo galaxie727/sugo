@@ -81,6 +81,7 @@
     font-size:12px;
     opacity:.75;
     min-height:18px;
+    line-height:1.5;
   }
   .boardWrap{
     padding:12px;
@@ -112,6 +113,9 @@
     grid-template-columns:repeat(5,1fr);
     gap:7px;
   }
+  .board.loopBoard{
+    grid-template-columns:repeat(4,1fr);
+  }
   .cell{
     min-height:78px;
     border-radius:16px;
@@ -120,7 +124,7 @@
     position:relative;
     overflow:hidden;
     padding:8px 6px 6px;
-    transition:transform .12s ease, box-shadow .12s ease;
+    transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
   }
   .cell.goal{
     background:linear-gradient(180deg,#7f6800 0%,#463700 100%);
@@ -129,9 +133,17 @@
   .cell.event-plus{ box-shadow:inset 0 0 0 1px rgba(120,255,160,.18); }
   .cell.event-minus{ box-shadow:inset 0 0 0 1px rgba(255,140,140,.16); }
   .cell.event-again{ box-shadow:inset 0 0 0 1px rgba(140,200,255,.16); }
+  .cell.trap{
+    box-shadow:inset 0 0 0 1px rgba(255,70,70,.22);
+  }
+  .cell.eliminated{
+    opacity:.55;
+  }
   .cell.active-step{
     transform:scale(1.03);
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.16), 0 0 0 2px rgba(255,255,255,.08);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.16),
+      0 0 0 2px rgba(255,255,255,.08);
   }
   .cellNum{
     font-size:11px;
@@ -168,6 +180,10 @@
     font-size:12px;
     font-weight:900;
     color:#111;
+  }
+  .token.out{
+    opacity:.35;
+    filter:grayscale(1);
   }
   .you{ background:#fff; }
   .a{ background:#ffbfdc; }
@@ -219,7 +235,8 @@
   .girlOverlay,
   .diceOverlay,
   .resultOverlay,
-  .orderOverlay{
+  .orderOverlay,
+  .modeOverlay{
     position:fixed;
     inset:0;
     z-index:90;
@@ -231,7 +248,8 @@
   .girlOverlay.show,
   .diceOverlay.show,
   .resultOverlay.show,
-  .orderOverlay.show{
+  .orderOverlay.show,
+  .modeOverlay.show{
     opacity:1;
     pointer-events:auto;
   }
@@ -477,7 +495,8 @@
     z-index:130;
     background:rgba(5,7,12,.94);
   }
-  .orderBox{
+  .orderBox,
+  .modeBox{
     position:absolute;
     left:50%;
     top:50%;
@@ -491,18 +510,21 @@
     padding:22px 18px 18px;
     box-shadow:0 14px 36px rgba(0,0,0,.22);
   }
-  .orderTitle{
+  .orderTitle,
+  .modeTitle{
     font-size:24px;
     font-weight:900;
     text-align:center;
     margin-bottom:12px;
   }
-  .orderSub{
+  .orderSub,
+  .modeSub{
     text-align:center;
     font-size:14px;
     opacity:.9;
     margin-bottom:14px;
     min-height:20px;
+    line-height:1.6;
   }
   .orderList{
     display:flex;
@@ -520,6 +542,39 @@
     font-weight:900;
   }
 
+  .modeOverlay{
+    z-index:140;
+    background:rgba(5,7,12,.96);
+  }
+  .modeList{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .modeBtn{
+    appearance:none;
+    width:100%;
+    text-align:left;
+    border:none;
+    border-radius:18px;
+    padding:16px 16px;
+    background:rgba(255,255,255,.07);
+    color:#fff;
+    cursor:pointer;
+  }
+  .modeBtnTitle{
+    display:block;
+    font-size:17px;
+    font-weight:900;
+    margin-bottom:6px;
+  }
+  .modeBtnDesc{
+    display:block;
+    font-size:13px;
+    opacity:.85;
+    line-height:1.55;
+  }
+
   .footerSpace{ height:10px; }
 </style>
 </head>
@@ -530,7 +585,7 @@
     <div class="panel statusBox">
       <div class="statusTop">
         <span id="turnLabel">現在の番：あなた</span>
-        <span>ゴール：20マス</span>
+        <span id="goalLabel">ゴール：20マス</span>
       </div>
       <div class="diceArea">
         <div class="diceEmoji">🎲</div>
@@ -541,7 +596,7 @@
 
     <div class="panel boardWrap">
       <div class="boardTitleRow">
-        <div class="boardTitle">盤面</div>
+        <div class="boardTitle" id="boardTitle">盤面</div>
         <button class="miniBtn" id="historyBtn" type="button">履歴</button>
       </div>
       <div class="board" id="board"></div>
@@ -603,6 +658,23 @@
     </div>
   </div>
 
+  <div class="modeOverlay" id="modeOverlay">
+    <div class="modeBox">
+      <div class="modeTitle">モード選択</div>
+      <div class="modeSub">遊びたいモードを選んでね。</div>
+      <div class="modeList">
+        <button class="modeBtn" id="modeNormalBtn" type="button">
+          <span class="modeBtnTitle">通常すごろく</span>
+          <span class="modeBtnDesc">20マス先のゴールを目指す普通のすごろく。</span>
+        </button>
+        <button class="modeBtn" id="modeSurvivalBtn" type="button">
+          <span class="modeBtnTitle">サバイバルすごろく</span>
+          <span class="modeBtnDesc">四角ループの罠マスを避けて最後の1人まで生き残るモード。</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="historyOverlay" id="historyOverlay">
     <div class="historySheet">
       <div class="historyHead">
@@ -614,14 +686,27 @@
   </div>
 
 <script>
-  const GOAL = 20;
+  const MODE = {
+    NORMAL: "normal",
+    SURVIVAL: "survival"
+  };
+
+  const NORMAL_CONFIG = {
+    goal: 20
+  };
+
+  const SURVIVAL_CONFIG = {
+    size: 12,
+    traps: [2, 5, 9]
+  };
+
   const STEP_DELAY = 260;
 
   const players = [
-    { id:"you", label:"あなた", short:"自", pos:0, type:"human", turnOrder:0 },
-    { id:"a", label:"チー娘A", short:"A", pos:0, type:"cpu", girlIndex:0, turnOrder:0 },
-    { id:"b", label:"チー娘B", short:"B", pos:0, type:"cpu", girlIndex:1, turnOrder:0 },
-    { id:"c", label:"チー娘C", short:"C", pos:0, type:"cpu", girlIndex:2, turnOrder:0 }
+    { id:"you", label:"あなた", short:"自", pos:0, type:"human", turnOrder:0, alive:true, finishOrder:null },
+    { id:"a", label:"チー娘A", short:"A", pos:0, type:"cpu", girlIndex:0, turnOrder:0, alive:true, finishOrder:null },
+    { id:"b", label:"チー娘B", short:"B", pos:0, type:"cpu", girlIndex:1, turnOrder:0, alive:true, finishOrder:null },
+    { id:"c", label:"チー娘C", short:"C", pos:0, type:"cpu", girlIndex:2, turnOrder:0, alive:true, finishOrder:null }
   ];
 
   const girls = [
@@ -635,9 +720,13 @@
       plus:["ちょっと得したね。","ラッキーだよ。","進んでいいよ。"],
       minus:["ちょっと戻ろっか。","少し下がるね。","ここは戻るみたい。"],
       again:["もう1回どうぞ。","続けて振っていいよ。","もう一度いけるよ。"],
+      trap:["そこ罠だったね。","落ちちゃった…。","ここで脱落だね。"],
+      survivalAlive:["まだ生き残ってる。","慎重にいこう。","危ないけど進めたね。"],
       winYou:["やった、あなたの勝ち。","先にゴールだね。","勝ち、おめでとう。"],
       loseToCpu:["惜しかったね。","あと少しだった。","次はいけるよ。"],
-      winCpu:["やった、私が1番。","先に着いたよ。","勝っちゃった。"]
+      winCpu:["やった、私が1番。","先に着いたよ。","勝っちゃった。"],
+      survivalYou:["最後まで残ったね。","生き残り、おめでとう。","やったね。最後の1人。"],
+      survivalCpu:["最後まで生き残ったよ。","私の勝ち。残ったね。","最後の1人になった。"]
     },
     {
       name:"チー娘B",
@@ -649,9 +738,13 @@
       plus:["ちょっと運いいじゃん。","はい、進んでいいよ。","ラッキーなんじゃない？"],
       minus:["少し戻るみたい。","まあ、そういう時もある。","戻ってね。"],
       again:["もう1回ね。","続けてどうぞ。","今回はもう1回でいいよ。"],
+      trap:["そこで落ちるの？","罠だったね。","はい、脱落。"],
+      survivalAlive:["まだ大丈夫。","生き残ってるね。","次も気をつけなよ。"],
       winYou:["あなたの勝ちか。まあいいけど。","先に着いたのね。","はいはい、おめでとう。"],
       loseToCpu:["惜しかったんじゃない？","あと少しだったね。","まあ、次かな。"],
-      winCpu:["私の勝ち。まあ当然かな。","ほらね、勝った。","先にゴールしたけど？"]
+      winCpu:["私の勝ち。まあ当然かな。","ほらね、勝った。","先にゴールしたけど？"],
+      survivalYou:["最後まで残ったのね。","生き残り勝ち、おめでとう。","へえ、最後の1人か。"],
+      survivalCpu:["私が最後まで残った。","はい、勝ち。","生き残ったのは私。"]
     },
     {
       name:"チー娘C",
@@ -663,13 +756,17 @@
       plus:["さらに進む。","得した。","前へ。"],
       minus:["少し下がる。","戻る。","……しかたない。"],
       again:["もう1回。","続けて。","再挑戦。"],
+      trap:["……落ちた。","そこは罠。","脱落。"],
+      survivalAlive:["……まだ生存。","まだ残ってる。","次。"],
       winYou:["ゴール。あなたの勝ち。","……先だったね。","勝ち。おめでとう。"],
       loseToCpu:["あと少し。","……惜しかった。","次。"],
-      winCpu:["ゴール。私の勝ち。","……先だった。","終わり。勝った。"]
+      winCpu:["ゴール。私の勝ち。","……先だった。","終わり。勝った。"],
+      survivalYou:["最後まで残った。すごい。","……生き残ったね。","勝ち。"],
+      survivalCpu:["最後まで残った。私の勝ち。","……生存。最後の1人。","終わり。勝った。"]
     }
   ];
 
-  const eventMap = {
+  const normalEventMap = {
     3:  { type:"plus",  value:2 },
     6:  { type:"minus", value:2 },
     8:  { type:"again", value:0 },
@@ -678,6 +775,7 @@
     17: { type:"again", value:0 }
   };
 
+  let gameMode = MODE.NORMAL;
   let turnIndex = 0;
   let gameEnded = false;
   let busy = false;
@@ -685,10 +783,13 @@
   let waitingForUserRoll = false;
   let currentSpeakerGirl = 0;
   let activeStepCell = null;
+  let eliminationOrder = [];
 
   const boardEl = document.getElementById("board");
   const rankingBodyEl = document.getElementById("rankingBody");
   const turnLabelEl = document.getElementById("turnLabel");
+  const goalLabelEl = document.getElementById("goalLabel");
+  const boardTitleEl = document.getElementById("boardTitle");
   const diceNumEl = document.getElementById("diceNum");
   const subInfoEl = document.getElementById("subInfo");
   const resetBtn = document.getElementById("resetBtn");
@@ -716,6 +817,10 @@
   const orderSub = document.getElementById("orderSub");
   const orderList = document.getElementById("orderList");
 
+  const modeOverlay = document.getElementById("modeOverlay");
+  const modeNormalBtn = document.getElementById("modeNormalBtn");
+  const modeSurvivalBtn = document.getElementById("modeSurvivalBtn");
+
   const historyOverlay = document.getElementById("historyOverlay");
   const historyBody = document.getElementById("historyBody");
   const closeHistoryBtn = document.getElementById("closeHistoryBtn");
@@ -741,9 +846,21 @@
     return player.type === "human" ? Math.floor(Math.random() * 3) : player.girlIndex;
   }
 
+  function getBoardSize(){
+    return gameMode === MODE.SURVIVAL ? SURVIVAL_CONFIG.size : NORMAL_CONFIG.goal + 1;
+  }
+
+  function getTrapList(){
+    return gameMode === MODE.SURVIVAL ? SURVIVAL_CONFIG.traps : [];
+  }
+
+  function getEventMap(){
+    return gameMode === MODE.NORMAL ? normalEventMap : {};
+  }
+
   function updateButtons(){
     overlayRollBtn.disabled = !(waitingForUserRoll && !busy && !gameEnded);
-    historyBtn.disabled = busy || resultOverlay.classList.contains("show") || orderOverlay.classList.contains("show");
+    historyBtn.disabled = busy || resultOverlay.classList.contains("show") || orderOverlay.classList.contains("show") || modeOverlay.classList.contains("show");
   }
 
   function setBusy(flag){
@@ -761,13 +878,43 @@
     return [...players].sort((a,b) => a.turnOrder - b.turnOrder);
   }
 
+  function getAliveTurnPlayers(){
+    return getTurnSortedPlayers().filter(p => p.alive);
+  }
+
   function getCurrentPlayer(){
-    return getTurnSortedPlayers()[turnIndex];
+    const list = gameMode === MODE.SURVIVAL ? getAliveTurnPlayers() : getTurnSortedPlayers();
+    return list[turnIndex];
+  }
+
+  function clampTurnIndex(){
+    const list = gameMode === MODE.SURVIVAL ? getAliveTurnPlayers() : getTurnSortedPlayers();
+    if(list.length === 0){
+      turnIndex = 0;
+    }else if(turnIndex >= list.length){
+      turnIndex = 0;
+    }
   }
 
   function updateTurnLabel(){
     const current = getCurrentPlayer();
-    turnLabelEl.textContent = `現在の番：${current.label}`;
+    if(current){
+      turnLabelEl.textContent = `現在の番：${current.label}`;
+    }else{
+      turnLabelEl.textContent = `現在の番：-`;
+    }
+  }
+
+  function updateModeLabels(){
+    if(gameMode === MODE.NORMAL){
+      goalLabelEl.textContent = `ゴール：20マス`;
+      boardTitleEl.textContent = `盤面`;
+      boardEl.classList.remove("loopBoard");
+    }else{
+      goalLabelEl.textContent = `生き残り`;
+      boardTitleEl.textContent = `盤面（サバイバル）`;
+      boardEl.classList.add("loopBoard");
+    }
   }
 
   function setSubInfo(text){
@@ -797,7 +944,7 @@
   }
 
   function openHistory(){
-    if(busy || resultOverlay.classList.contains("show") || orderOverlay.classList.contains("show")) return;
+    if(busy || resultOverlay.classList.contains("show") || orderOverlay.classList.contains("show") || modeOverlay.classList.contains("show")) return;
     historyOverlay.classList.add("show");
   }
 
@@ -830,6 +977,10 @@
   }
 
   function getFinalRanking(){
+    if(gameMode === MODE.SURVIVAL){
+      const alive = players.filter(p => p.alive).sort((a,b) => b.pos - a.pos);
+      return [...alive, ...eliminationOrder];
+    }
     return [...players].sort((a, b) => b.pos - a.pos);
   }
 
@@ -837,18 +988,29 @@
     const sorted = getFinalRanking();
     resultList.innerHTML = "";
     sorted.forEach((p, i) => {
+      const extra = gameMode === MODE.SURVIVAL ? (p.alive ? "生存" : "脱落") : `${p.pos} / ${NORMAL_CONFIG.goal}`;
       const row = document.createElement("div");
       row.className = "resultLine";
-      row.innerHTML = `<span>${i + 1}位　${p.label}</span><span>${p.pos} / ${GOAL}</span>`;
+      row.innerHTML = `<span>${i + 1}位　${p.label}</span><span>${extra}</span>`;
       resultList.appendChild(row);
     });
 
-    if(winner.id === "you"){
-      resultTitle.textContent = "あなたの勝ち！";
-      resultSub.textContent = "やったね。先にゴールしました。";
+    if(gameMode === MODE.SURVIVAL){
+      if(winner.id === "you"){
+        resultTitle.textContent = "あなたの勝ち！";
+        resultSub.textContent = "最後まで生き残りました。";
+      }else{
+        resultTitle.textContent = `${winner.label}の勝ち！`;
+        resultSub.textContent = "最後まで生き残ったのはその子でした。";
+      }
     }else{
-      resultTitle.textContent = `${winner.label}の勝ち！`;
-      resultSub.textContent = "惜しかった。あと少しでした。";
+      if(winner.id === "you"){
+        resultTitle.textContent = "あなたの勝ち！";
+        resultSub.textContent = "やったね。先にゴールしました。";
+      }else{
+        resultTitle.textContent = `${winner.label}の勝ち！`;
+        resultSub.textContent = "惜しかった。あと少しでした。";
+      }
     }
 
     resultOverlay.classList.add("show");
@@ -861,6 +1023,29 @@
   }
 
   async function playEndingEmotion(winner){
+    if(gameMode === MODE.SURVIVAL){
+      if(winner.id === "you"){
+        const girlIndex = Math.floor(Math.random() * 3);
+        showGirl(girlIndex, rand(girls[girlIndex].survivalYou), false);
+        await wait(1700);
+        hideGirl();
+        await wait(200);
+      }else{
+        const girlIndex = winner.girlIndex;
+        showGirl(girlIndex, rand(girls[girlIndex].survivalCpu), false);
+        await wait(1700);
+        hideGirl();
+        await wait(200);
+
+        const comfortGirl = Math.floor(Math.random() * 3);
+        showGirl(comfortGirl, rand(girls[comfortGirl].loseToCpu), false);
+        await wait(1500);
+        hideGirl();
+        await wait(150);
+      }
+      return;
+    }
+
     if(winner.id === "you"){
       const girlIndex = Math.floor(Math.random() * 3);
       showGirl(girlIndex, rand(girls[girlIndex].winYou), false);
@@ -920,13 +1105,33 @@
     document.querySelectorAll(".cell.active-step").forEach(el => el.classList.remove("active-step"));
   }
 
-  function drawBoard(){
-    boardEl.innerHTML = "";
+  function getLoopOrder(size){
+    if(size !== 12) return Array.from({length:size}, (_,i)=>i);
+    return [0,1,2,3,4,5,6,7,8,9,10,11];
+  }
 
-    for(let i = 0; i <= GOAL; i++){
+  function getLoopGridPosition(index, size){
+    if(size !== 12){
+      return { row: Math.floor(index / 4), col: index % 4 };
+    }
+    const positions = [
+      {row:0,col:0},{row:0,col:1},{row:0,col:2},{row:0,col:3},
+      {row:1,col:3},{row:2,col:3},
+      {row:2,col:2},{row:2,col:1},{row:2,col:0},
+      {row:1,col:0},
+      {row:1,col:1},{row:1,col:2}
+    ];
+    return positions[index];
+  }
+
+  function drawNormalBoard(){
+    boardEl.innerHTML = "";
+    const eventMap = getEventMap();
+
+    for(let i = 0; i <= NORMAL_CONFIG.goal; i++){
       const cell = document.createElement("div");
       let cls = "cell";
-      if(i === GOAL) cls += " goal";
+      if(i === NORMAL_CONFIG.goal) cls += " goal";
       if(eventMap[i]?.type === "plus") cls += " event-plus";
       if(eventMap[i]?.type === "minus") cls += " event-minus";
       if(eventMap[i]?.type === "again") cls += " event-again";
@@ -935,7 +1140,7 @@
 
       const num = document.createElement("div");
       num.className = "cellNum";
-      num.textContent = i === GOAL ? "GOAL" : i;
+      num.textContent = i === NORMAL_CONFIG.goal ? "GOAL" : i;
       cell.appendChild(num);
 
       if(eventMap[i]){
@@ -963,22 +1168,98 @@
     }
   }
 
+  function drawSurvivalBoard(){
+    boardEl.innerHTML = "";
+    const size = SURVIVAL_CONFIG.size;
+    const traps = SURVIVAL_CONFIG.traps;
+
+    const map = new Map();
+    for(let i = 0; i < size; i++){
+      const pos = getLoopGridPosition(i, size);
+      map.set(`${pos.row}-${pos.col}`, i);
+    }
+
+    const rows = 3;
+    const cols = 4;
+    for(let r = 0; r < rows; r++){
+      for(let c = 0; c < cols; c++){
+        const key = `${r}-${c}`;
+        const idx = map.has(key) ? map.get(key) : null;
+
+        const cell = document.createElement("div");
+        let cls = "cell";
+        if(idx !== null && traps.includes(idx)) cls += " trap";
+        if(idx !== null && activeStepCell === idx) cls += " active-step";
+        cell.className = cls;
+
+        if(idx !== null){
+          const num = document.createElement("div");
+          num.className = "cellNum";
+          num.textContent = idx;
+          cell.appendChild(num);
+
+          if(traps.includes(idx)){
+            const mark = document.createElement("div");
+            mark.className = "eventMark";
+            mark.textContent = "⚠";
+            cell.appendChild(mark);
+          }
+
+          const tokens = document.createElement("div");
+          tokens.className = "tokens";
+          players.forEach(player => {
+            if(player.pos === idx){
+              const token = document.createElement("div");
+              token.className = `token ${player.id}${player.alive ? "" : " out"}`;
+              token.textContent = player.short;
+              tokens.appendChild(token);
+            }
+          });
+          cell.appendChild(tokens);
+
+          if(players.some(p => p.pos === idx && !p.alive)){
+            cell.classList.add("eliminated");
+          }
+        }else{
+          cell.style.opacity = ".18";
+        }
+
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function drawBoard(){
+    updateModeLabels();
+    if(gameMode === MODE.SURVIVAL){
+      drawSurvivalBoard();
+    }else{
+      drawNormalBoard();
+    }
+  }
+
   function updateRanking(){
     const sorted = getFinalRanking();
     rankingBodyEl.innerHTML = "";
     sorted.forEach((p, index) => {
       const row = document.createElement("div");
       row.className = "rankLine";
-      row.innerHTML = `<span>${index + 1}位　${p.label}</span><span>${p.pos} / ${GOAL}</span>`;
+      const right = gameMode === MODE.SURVIVAL ? (p.alive ? `生存 / ${p.pos}` : `脱落`) : `${p.pos} / ${NORMAL_CONFIG.goal}`;
+      row.innerHTML = `<span>${index + 1}位　${p.label}</span><span>${right}</span>`;
       rankingBodyEl.appendChild(row);
     });
   }
 
   async function animateForwardMove(player, steps){
     if(steps <= 0) return;
+    const boardSize = getBoardSize();
     for(let i = 0; i < steps; i++){
-      if(player.pos >= GOAL) break;
-      player.pos += 1;
+      if(gameMode === MODE.NORMAL){
+        if(player.pos >= NORMAL_CONFIG.goal) break;
+        player.pos += 1;
+      }else{
+        player.pos = (player.pos + 1) % boardSize;
+      }
       activeStepCell = player.pos;
       drawBoard();
       updateRanking();
@@ -1007,7 +1288,9 @@
   }
 
   async function introForCurrentTurn(){
+    clampTurnIndex();
     const player = getCurrentPlayer();
+    if(!player) return;
     const girlIndex = getGirlIndexForTurn(player);
     currentSpeakerGirl = girlIndex;
     updateTurnLabel();
@@ -1047,9 +1330,22 @@
     await wait(280);
   }
 
-  async function handleEvent(player, girlIndex){
-    const event = eventMap[player.pos];
-    if(!event || player.pos >= GOAL) return false;
+  function getAliveCount(){
+    return players.filter(p => p.alive).length;
+  }
+
+  async function eliminatePlayer(player, girlIndex){
+    player.alive = false;
+    eliminationOrder.push(player);
+    setSubInfo(`${player.label} は脱落`);
+    drawBoard();
+    updateRanking();
+    await showResultReaction(girlIndex, rand(girls[girlIndex].trap));
+  }
+
+  async function handleNormalEvent(player, girlIndex){
+    const event = normalEventMap[player.pos];
+    if(!event || player.pos >= NORMAL_CONFIG.goal) return false;
 
     if(event.type === "plus"){
       const before = player.pos;
@@ -1057,8 +1353,7 @@
       await animateForwardMove(player, event.value);
       addHistory(`${player.label} はイベントで ${event.value} マス進んだ（${before} → ${player.pos}）`);
       await showResultReaction(girlIndex, rand(girls[girlIndex].plus));
-
-      if(player.pos >= GOAL){
+      if(player.pos >= NORMAL_CONFIG.goal){
         await handleWin(player);
       }
       return false;
@@ -1090,15 +1385,46 @@
     return false;
   }
 
+  async function handleSurvivalEvent(player, girlIndex){
+    const traps = SURVIVAL_CONFIG.traps;
+    if(!traps.includes(player.pos)) {
+      await showResultReaction(girlIndex, rand(girls[girlIndex].survivalAlive));
+      return false;
+    }
+
+    addHistory(`${player.label} は罠マス ${player.pos} に止まり脱落。`);
+    await eliminatePlayer(player, girlIndex);
+
+    if(getAliveCount() === 1){
+      const winner = players.find(p => p.alive);
+      await handleWin(winner);
+      return false;
+    }
+
+    return false;
+  }
+
+  async function handleEvent(player, girlIndex){
+    if(gameMode === MODE.SURVIVAL){
+      return await handleSurvivalEvent(player, girlIndex);
+    }
+    return await handleNormalEvent(player, girlIndex);
+  }
+
   async function handleWin(player){
     gameEnded = true;
     waitingForUserRoll = false;
     setBusy(false);
     updateRanking();
 
-    addHistory(`${player.label} がゴール。`);
+    if(gameMode === MODE.SURVIVAL){
+      addHistory(`${player.label} が最後まで生き残った。`);
+      showDice("生き残り", "★");
+    }else{
+      addHistory(`${player.label} がゴール。`);
+      showDice("ゴール", "★");
+    }
 
-    showDice("ゴール", "★");
     await wait(1300);
     hideDice();
     await wait(150);
@@ -1113,6 +1439,10 @@
     setBusy(true);
 
     const player = getCurrentPlayer();
+    if(!player) {
+      setBusy(false);
+      return;
+    }
     const girlIndex = currentSpeakerGirl || getGirlIndexForTurn(player);
     const before = player.pos;
 
@@ -1141,27 +1471,75 @@
     await wait(150);
 
     await animateForwardMove(player, dice);
-    addHistory(`${player.label} が ${dice} マス進んだ（${before} → ${player.pos}）`);
+
+    if(gameMode === MODE.SURVIVAL){
+      addHistory(`${player.label} が ${dice} マス進んだ（${before} → ${player.pos}）`);
+    }else{
+      addHistory(`${player.label} が ${dice} マス進んだ（${before} → ${player.pos}）`);
+    }
+
     setSubInfo(`${player.pos} マス目に到着`);
 
-    await showResultReaction(girlIndex, rand(girls[girlIndex].move));
+    if(gameMode === MODE.NORMAL){
+      await showResultReaction(girlIndex, rand(girls[girlIndex].move));
+    }
 
-    if(player.pos >= GOAL){
+    if(gameMode === MODE.NORMAL && player.pos >= NORMAL_CONFIG.goal){
       await handleWin(player);
       return;
     }
 
-    const again = await handleEvent(player, girlIndex);
+    await handleEvent(player, girlIndex);
     if(gameEnded) return;
-    if(again) return;
+
+    if(gameMode === MODE.SURVIVAL && !player.alive){
+      const aliveList = getAliveTurnPlayers();
+      if(aliveList.length === 0) return;
+      if(turnIndex >= aliveList.length){
+        turnIndex = 0;
+      }
+      setBusy(false);
+      await wait(700);
+      await introForCurrentTurn();
+      return;
+    }
+
+    if(gameMode === MODE.NORMAL){
+      const event = normalEventMap[player.pos];
+      if(event && event.type === "again"){
+        return;
+      }
+    }
 
     if(!keepTurn){
-      turnIndex = (turnIndex + 1) % players.length;
+      if(gameMode === MODE.SURVIVAL){
+        const aliveList = getAliveTurnPlayers();
+        if(aliveList.length > 0){
+          const currentAlive = aliveList;
+          turnIndex = (turnIndex + 1) % currentAlive.length;
+        } else {
+          turnIndex = 0;
+        }
+      }else{
+        turnIndex = (turnIndex + 1) % players.length;
+      }
     }
 
     setBusy(false);
     await wait(700);
     await introForCurrentTurn();
+  }
+
+  async function askModeAndStart(){
+    modeOverlay.classList.add("show");
+    updateButtons();
+  }
+
+  async function startGameWithMode(mode){
+    gameMode = mode;
+    modeOverlay.classList.remove("show");
+    updateButtons();
+    await resetGame(true);
   }
 
   async function resetGame(showOrder = true){
@@ -1174,8 +1552,11 @@
     players.forEach(p => {
       p.pos = 0;
       p.turnOrder = 0;
+      p.alive = true;
+      p.finishOrder = null;
     });
 
+    eliminationOrder = [];
     turnIndex = 0;
     gameEnded = false;
     busy = false;
@@ -1185,6 +1566,7 @@
 
     diceNumEl.textContent = "-";
 
+    updateModeLabels();
     drawBoard();
     updateRanking();
     renderHistory();
@@ -1198,7 +1580,7 @@
     }
 
     updateTurnLabel();
-    addHistory("ゲーム開始。");
+    addHistory(`ゲーム開始（${gameMode === MODE.SURVIVAL ? "サバイバル" : "通常"}）。`);
     await wait(500);
     await introForCurrentTurn();
   }
@@ -1214,11 +1596,14 @@
     if(e.target === historyOverlay) closeHistory();
   });
 
-  resetBtn.addEventListener("click", () => resetGame(true));
-  retryBtn.addEventListener("click", () => resetGame(true));
-  topBtn.addEventListener("click", () => resetGame(true));
+  resetBtn.addEventListener("click", askModeAndStart);
+  retryBtn.addEventListener("click", askModeAndStart);
+  topBtn.addEventListener("click", askModeAndStart);
 
-  resetGame(true);
+  modeNormalBtn.addEventListener("click", () => startGameWithMode(MODE.NORMAL));
+  modeSurvivalBtn.addEventListener("click", () => startGameWithMode(MODE.SURVIVAL));
+
+  askModeAndStart();
 </script>
 </body>
 </html>
